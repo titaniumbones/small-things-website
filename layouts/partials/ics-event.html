@@ -1,0 +1,17 @@
+{{- /* One VEVENT. Expects an event page. Times are emitted in UTC. */ -}}
+{{- $status := .Params.status | default "confirmed" -}}
+{{- $end := .Date.Add (time.ParseDuration "1h") -}}{{- with .Params.end }}{{ $end = time.AsTime . }}{{ end -}}
+BEGIN:VEVENT
+UID:{{ .File.UniqueID }}@{{ (urls.Parse site.BaseURL).Host }}
+DTSTAMP:{{ now.UTC.Format "20060102T150405Z" }}
+DTSTART:{{ .Date.UTC.Format "20060102T150405Z" }}
+DTEND:{{ $end.UTC.Format "20060102T150405Z" }}
+SUMMARY:{{ partial "ics-text.html" (printf "%s%s" (cond (eq $status "tbc") "[Date TBC] " "") .Title) }}
+{{ with .Params.location -}}
+LOCATION:{{ partial "ics-text.html" . }}
+{{ end -}}
+DESCRIPTION:{{ partial "ics-text.html" (printf "%s\n\n%s" (.Summary | plainify | strings.TrimSpace) .Permalink) }}
+URL:{{ .Permalink }}
+CATEGORIES:{{ partial "ics-text.html" .CurrentSection.Title }}
+STATUS:{{ if eq $status "cancelled" }}CANCELLED{{ else if eq $status "tbc" }}TENTATIVE{{ else }}CONFIRMED{{ end }}
+END:VEVENT

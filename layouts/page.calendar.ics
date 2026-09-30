@@ -1,0 +1,1 @@
+{{- partial "ics-calendar.html" (dict "name" .Title "events" (slice .)) -}}

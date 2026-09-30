@@ -1,0 +1,8 @@
+{{- /* Expects an event page. Time range and location, one line. */ -}}
+{{- $start := .Date -}}
+{{- $end := "" -}}{{- with .Params.end }}{{ $end = time.AsTime . }}{{ end -}}
+<span class="when">
+  <time datetime="{{ $start.Format "2006-01-02T15:04:05Z07:00" }}">{{ $start.Format "3:04" }}{{ if not $end }}{{ $start.Format " pm" | lower }}{{ end }}</time>
+  {{- with $end }}<span aria-hidden="true">–</span><span class="sr-only"> to </span><time datetime="{{ .Format "2006-01-02T15:04:05Z07:00" }}">{{ .Format "3:04 pm" | lower }}</time>{{ end -}}
+  {{- with .Params.location }}<span class="where">{{ . }}</span>{{ end -}}
+</span>

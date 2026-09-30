@@ -1,0 +1,20 @@
+{{- $out := slice -}}
+{{- range partial "all-events.html" site -}}
+{{- $end := "" }}{{ with .Params.end }}{{ $end = (time.AsTime .).Format "2006-01-02T15:04:05Z07:00" }}{{ end -}}
+{{- $out = $out | append (dict
+  "title" .Title
+  "start" (.Date.Format "2006-01-02T15:04:05Z07:00")
+  "end" $end
+  "location" (.Params.location | default "")
+  "series" .Params.series
+  "seriesName" .CurrentSection.Title
+  "status" (.Params.status | default "confirmed")
+  "speakers" (.Params.speakers | default slice)
+  "episode" .Params.episode
+  "object" (.Params.object | default "")
+  "audio" (.Params.audio | default "")
+  "url" .Permalink
+  "summary" (.Summary | plainify | strings.TrimSpace)
+) -}}
+{{- end -}}
+{{- dict "generated" (now.UTC.Format "2006-01-02T15:04:05Z") "events" $out | jsonify (dict "indent" "  ") -}}

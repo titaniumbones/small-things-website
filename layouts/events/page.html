@@ -1,0 +1,36 @@
+{{ define "bodyclass" }}event series-{{ .CurrentSection.Params.colour }}{{ end }}
+{{ define "main" }}
+{{- $status := .Params.status | default "confirmed" -}}
+{{- $isST := eq .Params.series "small-things" -}}
+<article class="event-page">
+  <header class="event-hero event-hero-{{ .CurrentSection.Params.colour }}">
+    <div class="section-inner">
+      <p class="event-series">{{ partial "series-chip.html" . }}{{ if eq $status "cancelled" }} <span class="flag flag-cancelled">Cancelled</span>{{ else if eq $status "tbc" }} <span class="flag flag-tbc">Date to be confirmed</span>{{ end }}</p>
+      {{- if $isST }}<p class="event-number">{{ if eq (int (.Params.episode | default 0)) 0 }}Pilot{{ else }}Episode {{ .Params.episode }}{{ end }}</p>{{ end }}
+      <h1 class="event-title">{{ .Title }}</h1>
+      <dl class="event-facts">
+        <div><dt>When</dt><dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "Monday 2 January 2006" }}</time>, {{ partial "event-when.html" . }}</dd></div>
+        {{- with .Params.speakers }}{{ $sp := . }}{{ if and (gt (len $sp) 0) (ne (index $sp 0) "") }}<div><dt>{{ if gt (len $sp) 1 }}Speakers{{ else }}{{ if $isST }}Guest{{ else }}Speaker{{ end }}{{ end }}</dt><dd>{{ delimit $sp ", " " and " }}{{ with $.Params.department }}, {{ . }}{{ end }}</dd></div>{{ end }}{{ end }}
+        {{- with .Params.object }}<div><dt>The object</dt><dd>{{ . }}</dd></div>{{ end }}
+      </dl>
+    </div>
+  </header>
+  <div class="section">
+    <div class="section-inner prose-and-aside">
+      <div class="prose">
+        {{ .Content }}
+        {{- with .Params.audio }}
+        <h2>Listen</h2>
+        <audio controls preload="none" src="{{ . }}"></audio>
+        {{- end }}
+      </div>
+      <aside class="aside">
+        {{- with .OutputFormats.Get "calendar" }}<p><a class="button button-quiet" href="{{ .Permalink }}">Add to my calendar (.ics)</a></p>{{ end }}
+        {{- with .Params.link }}<p><a class="button button-quiet" href="{{ . }}">More information</a></p>{{ end }}
+        {{- if .Params.imported }}<p class="aside-note">From the HISS Hub's shared calendar.</p>{{ end }}
+        <p class="aside-note"><a href="{{ .CurrentSection.RelPermalink }}">More from {{ .CurrentSection.Title }}</a></p>
+      </aside>
+    </div>
+  </div>
+</article>
+{{ end }}

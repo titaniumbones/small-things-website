@@ -1,0 +1,62 @@
+baseURL = "https://titaniumbones.github.io/small-things-website/"
+languageCode = "en-ca"
+title = "Small Things"
+timeZone = "America/Toronto"
+enableRobotsTXT = true
+buildFuture = true
+disableKinds = ["taxonomy", "term"]
+
+[params]
+  description = "A live-recorded podcast from the HISS Research Hub at the University of Toronto Scarborough. One faculty guest, one object, one conversation."
+  contactEmail = "matt.price@utoronto.ca"
+  hubName = "HISS Research Hub"
+  hubUrl = "https://hiss.utsc.utoronto.ca"
+  hcsUrl = "https://www.utsc.utoronto.ca/hcs/"
+  utscUrl = "https://www.utsc.utoronto.ca"
+  # Outlook ICS feed for HISS Hub events. Read by scripts/import_ics.py.
+  outlookFeed = "https://outlook.office365.com/owa/calendar/440eb03d2eb1441f8a1eb982ca0bfe85@utoronto.ca/09ed34891be24022a7a03e4f01f021ba18325636079788834604/calendar.ics"
+  upcomingOnHome = 5
+
+[outputFormats.calendar]
+  mediaType = "text/calendar"
+  baseName = "calendar"
+  isPlainText = true
+  notAlternative = false
+
+[outputFormats.eventsjson]
+  mediaType = "application/json"
+  baseName = "events"
+  isPlainText = true
+
+[mediaTypes."text/calendar"]
+  suffixes = ["ics"]
+
+[outputs]
+  home = ["html", "calendar", "eventsjson"]
+  section = ["html", "calendar"]
+  page = ["html", "calendar"]
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[menus]
+  [[menus.main]]
+    name = "Small Things"
+    pageRef = "/events/small-things"
+    weight = 10
+  [[menus.main]]
+    name = "Calendar"
+    pageRef = "/calendar"
+    weight = 20
+  [[menus.main]]
+    name = "Speakers' Corner"
+    pageRef = "/events/speakers-corner"
+    weight = 30
+  [[menus.main]]
+    name = "HISS Hub"
+    pageRef = "/events/hiss"
+    weight = 40
+  [[menus.main]]
+    name = "About"
+    pageRef = "/about"
+    weight = 50

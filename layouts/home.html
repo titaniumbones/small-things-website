@@ -1,0 +1,81 @@
+{{ define "bodyclass" }}home{{ end }}
+{{ define "main" }}
+{{- $all := partial "all-events.html" site -}}
+{{- $now := now -}}
+{{- $upcoming := where $all "Date" "ge" $now -}}
+{{- $upcoming = where $upcoming "Params.status" "ne" "cancelled" -}}
+{{- $st := site.GetPage "/events/small-things" -}}
+{{- $stUpcoming := where $upcoming "Params.series" "small-things" -}}
+{{- $next := index $stUpcoming 0 -}}
+{{- $published := where (where $st.RegularPages "Params.audio" "ne" "") "Params.audio" "ne" nil -}}
+{{- $latest := index $published.ByDate.Reverse 0 -}}
+
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-kicker">A live-recorded podcast from the HISS Research Hub, UTSC</p>
+    <h1 class="hero-title"><span class="hero-small">Small</span><span class="hero-big">Things</span></h1>
+    <p class="hero-lede">One faculty guest. One object on the table. One hour to find out how much it can hold. Recorded live on campus at lunchtime, with pizza, and everyone is welcome.</p>
+    <p class="hero-actions">
+      {{ with $next }}<a class="button button-coral" href="{{ .RelPermalink }}">Next recording</a>{{ end }}
+      <a class="button button-ghost" href="{{ $st.RelPermalink }}">Episodes</a>
+      <a class="button button-ghost" href="{{ (site.GetPage "/calendar").RelPermalink }}">Calendar</a>
+    </p>
+  </div>
+</section>
+
+{{ with $next }}
+<section class="next-band">
+  <div class="band-inner">
+    <p class="band-label">Next recording</p>
+    <p class="band-date"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Monday 2 January" }}</time>{{ if eq (.Params.status | default "confirmed") "tbc" }} <span class="flag flag-tbc">date to be confirmed</span>{{ end }}</p>
+    <h2 class="band-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+    <p class="band-meta">{{ partial "event-when.html" . }}</p>
+    {{ with .Params.object }}<p class="band-object">The object: {{ . }}</p>{{ end }}
+  </div>
+</section>
+{{ end }}
+
+<section class="section">
+  <div class="section-inner">
+    <div class="section-head">
+      <h2>Coming up</h2>
+      <a class="more" href="{{ (site.GetPage "/calendar").RelPermalink }}">Full calendar</a>
+    </div>
+    {{- with first (site.Params.upcomingOnHome | default 5) $upcoming }}
+    <ul class="event-list">
+      {{- range . }}{{ partial "event-row.html" . }}{{ end }}
+    </ul>
+    {{- else }}
+    <p class="empty">Nothing scheduled yet. Subscribe to the calendar and you will hear when something is.</p>
+    {{- end }}
+    {{ partial "subscribe.html" site.Home }}
+  </div>
+</section>
+
+{{ with $latest }}
+<section class="section section-tint">
+  <div class="section-inner">
+    <div class="section-head"><h2>Latest episode</h2><a class="more" href="{{ $st.RelPermalink }}">All episodes</a></div>
+    <article class="episode-card">
+      <p class="ep-number">{{ if eq (int .Params.episode) 0 }}Pilot{{ else }}Episode {{ .Params.episode }}{{ end }}</p>
+      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      {{ with .Params.object }}<p class="ep-object">The object: {{ . }}</p>{{ end }}
+      <audio controls preload="none" src="{{ .Params.audio }}"></audio>
+    </article>
+  </div>
+</section>
+{{ end }}
+
+<section class="section">
+  <div class="section-inner series-grid">
+    {{- range (site.GetPage "/events").Sections.ByWeight }}
+    <article class="series-card series-{{ .Params.colour }}">
+      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <p>{{ .Params.short }}</p>
+      {{- $n := len (where $upcoming "Params.series" .Params.series) }}
+      <p class="series-count">{{ if eq $n 0 }}No dates yet{{ else if eq $n 1 }}1 upcoming event{{ else }}{{ $n }} upcoming events{{ end }}</p>
+    </article>
+    {{- end }}
+  </div>
+</section>
+{{ end }}

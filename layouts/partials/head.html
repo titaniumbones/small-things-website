@@ -1,0 +1,18 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{{- $title := .Title -}}
+{{- if .IsHome }}{{ $title = printf "%s: a live-recorded podcast from UTSC" site.Title }}{{ else }}{{ $title = printf "%s | %s" .Title site.Title }}{{ end -}}
+<title>{{ $title }}</title>
+<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Params.short }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}{{ end }}">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ .Permalink }}">
+<meta name="theme-color" content="#1e3765">
+{{- range .AlternativeOutputFormats }}
+<link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{ $.Title }}">
+{{- end }}
+{{- $latin := "fonts/BricolageGrotesque-latin.woff2" | relURL }}
+<link rel="preload" href="{{ $latin }}" as="font" type="font/woff2" crossorigin>
+{{- $scss := resources.Get "scss/main.scss" | css.Sass (dict "outputStyle" "compressed") | fingerprint }}
+<link rel="stylesheet" href="{{ $scss.RelPermalink }}" integrity="{{ $scss.Data.Integrity }}">
+<link rel="icon" href="{{ "favicon.svg" | relURL }}" type="image/svg+xml">

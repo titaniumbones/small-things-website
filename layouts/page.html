@@ -1,0 +1,4 @@
+{{ define "main" }}
+<section class="page-head"><div class="section-inner"><h1>{{ .Title }}</h1>{{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}</div></section>
+<section class="section"><div class="section-inner"><div class="prose prose-narrow">{{ .Content }}</div></div></section>
+{{ end }}

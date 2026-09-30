@@ -1,0 +1,13 @@
+{{- /* One line in a list. Expects an event page. */ -}}
+{{- $status := .Params.status | default "confirmed" -}}
+<li class="event-row status-{{ $status }}" data-series="{{ .Params.series }}">
+  <div class="row-date" aria-hidden="true">
+    <span class="row-day">{{ .Date.Format "2" }}</span>
+    <span class="row-dow">{{ .Date.Format "Mon" }}<br>{{ .Date.Format "Jan" }}</span>
+  </div>
+  <div class="row-body">
+    <h3 class="row-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a>{{ if eq $status "cancelled" }} <span class="flag flag-cancelled">Cancelled</span>{{ else if eq $status "tbc" }} <span class="flag flag-tbc">Date to be confirmed</span>{{ end }}</h3>
+    <p class="row-meta"><span class="sr-only">{{ .Date.Format "Monday 2 January 2006" }}, </span>{{ partial "event-when.html" . }}</p>
+  </div>
+  {{ partial "series-chip.html" . }}
+</li>

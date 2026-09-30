@@ -1,0 +1,17 @@
+[project]
+name = "small-things-website"
+version = "0.1.0"
+description = "Scripts and tests for the Small Things website (Hugo)"
+requires-python = ">=3.11"
+dependencies = [
+  "icalendar>=6",
+  "recurring-ical-events>=3",
+  "pyyaml",
+  "requests",
+]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

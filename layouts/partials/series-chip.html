@@ -1,0 +1,3 @@
+{{- /* Expects an event page. Renders the series name as a coloured chip. */ -}}
+{{- $s := .CurrentSection -}}
+<a class="chip chip-{{ $s.Params.colour | default "teal" }}" href="{{ $s.RelPermalink }}">{{ $s.Title }}</a>

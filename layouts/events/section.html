@@ -1,0 +1,69 @@
+{{ define "bodyclass" }}series series-{{ .Params.colour }}{{ end }}
+{{ define "main" }}
+{{- if eq .Section .Title | and (not .Params.series) }}{{ end -}}
+{{- $now := now -}}
+{{- if not .Params.series }}
+{{- /* /events/ : list the series */ -}}
+<section class="page-head"><div class="section-inner"><h1>{{ .Title }}</h1><p class="lede">Three series, listed together on the <a href="{{ (site.GetPage "/calendar").RelPermalink }}">calendar</a>.</p></div></section>
+<section class="section"><div class="section-inner series-grid">
+  {{- range .Sections.ByWeight }}
+  <article class="series-card series-{{ .Params.colour }}"><h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2><p>{{ .Params.short }}</p></article>
+  {{- end }}
+</div></section>
+{{- else }}
+{{- $events := .RegularPages.ByDate -}}
+{{- $upcoming := where $events "Date" "ge" $now -}}
+{{- $past := (where $events "Date" "lt" $now).Reverse -}}
+{{- $isST := eq .Params.series "small-things" -}}
+<section class="page-head page-head-{{ .Params.colour }}">
+  <div class="section-inner">
+    <h1>{{ .Title }}</h1>
+    <p class="lede">{{ .Params.short }}</p>
+  </div>
+</section>
+<section class="section">
+  <div class="section-inner prose-and-aside">
+    <div class="prose">{{ .Content }}</div>
+    <aside class="aside">
+      {{ partial "subscribe.html" . }}
+      {{- if .Params.imported }}<p class="aside-note">These events come from the HISS Hub's shared Outlook calendar and refresh once a day. To change one, change it in that calendar.</p>{{ end }}
+    </aside>
+  </div>
+</section>
+<section class="section">
+  <div class="section-inner">
+    <div class="section-head"><h2>{{ if $isST }}Upcoming recordings{{ else }}Upcoming{{ end }}</h2></div>
+    {{- with $upcoming }}
+    {{ partial "month-list.html" (dict "pages" .) }}
+    {{- else }}
+    <p class="empty">No dates yet. Subscribe above and you will hear as soon as there are.</p>
+    {{- end }}
+  </div>
+</section>
+{{- with $past }}
+<section class="section section-tint">
+  <div class="section-inner">
+    <div class="section-head"><h2>{{ if $isST }}Episodes{{ else }}Past events{{ end }}</h2></div>
+    {{- if $isST }}
+    <ul class="episode-grid">
+      {{- range . }}
+      <li class="episode-card">
+        <p class="ep-number">{{ if eq (int (.Params.episode | default 0)) 0 }}Pilot{{ else }}Episode {{ .Params.episode }}{{ end }}</p>
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p class="ep-meta">{{ .Date.Format "2 January 2006" }}{{ with .Params.department }}. {{ . }}{{ end }}</p>
+        {{ with .Params.object }}<p class="ep-object">The object: {{ . }}</p>{{ end }}
+        {{ with .Params.audio }}<audio controls preload="none" src="{{ . }}"></audio>{{ else }}<p class="ep-pending">Recording not yet published.</p>{{ end }}
+      </li>
+      {{- end }}
+    </ul>
+    {{- else }}
+    <details class="past">
+      <summary>Show {{ len . }} past event{{ if ne (len .) 1 }}s{{ end }}</summary>
+      <ul class="event-list">{{ range . }}{{ partial "event-row.html" . }}{{ end }}</ul>
+    </details>
+    {{- end }}
+  </div>
+</section>
+{{- end }}
+{{- end }}
+{{ end }}

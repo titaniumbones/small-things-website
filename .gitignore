@@ -1,0 +1,15 @@
+# Hugo build output
+public/
+resources/_gen/
+.hugo_build.lock
+
+# HISS Hub events are generated from the Outlook feed at build time
+content/events/hiss/*
+!content/events/hiss/_index.md
+
+# Python
+__pycache__/
+.pytest_cache/
+.venv/
+
+.DS_Store

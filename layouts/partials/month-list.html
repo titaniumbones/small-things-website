@@ -1,0 +1,12 @@
+{{- /* Expects dict "pages" (event pages) and optional "order" ("asc" default, or "desc"). Groups by month. */ -}}
+{{- $order := .order | default "asc" -}}
+{{- range .pages.GroupByDate "January 2006" $order }}
+<section class="month" data-month>
+  <h2 class="month-heading">{{ .Key }}</h2>
+  <ul class="event-list">
+    {{- range .Pages.ByDate }}
+    {{ partial "event-row.html" . }}
+    {{- end }}
+  </ul>
+</section>
+{{- end }}

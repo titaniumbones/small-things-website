@@ -1,0 +1,2 @@
+{{- /* Returns all event pages sorted by date. Call as: partial "all-events.html" site */ -}}
+{{- return (where .RegularPages "Section" "events").ByDate -}}

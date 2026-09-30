@@ -1,0 +1,5 @@
+{{- /* Expects dict "name" string, "events" pages. Returns the full calendar text with CRLF line endings. */ -}}
+{{- $body := printf "BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Small Things//UTSC//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-WR-CALNAME:%s\nX-WR-TIMEZONE:America/Toronto\n" (partial "ics-text.html" .name) -}}
+{{- range .events }}{{ $body = printf "%s%s" $body (partial "ics-event.html" .) }}{{ end -}}
+{{- $body = printf "%sEND:VCALENDAR\n" $body -}}
+{{- return (replace $body "\n" "\r\n") -}}

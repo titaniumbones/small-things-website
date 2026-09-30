@@ -1,0 +1,7 @@
+{{- /* Expects a page with a calendar output format. */ -}}
+{{- with .OutputFormats.Get "calendar" }}
+<p class="subscribe">
+  <a class="button button-quiet" href="{{ .Permalink }}">{{ with $.Params.subscribeLabel }}{{ . }}{{ else }}Subscribe to {{ if $.IsHome }}all events{{ else }}{{ $.Title }}{{ end }} (.ics){{ end }}</a>
+  <span class="subscribe-hint">Paste the link into Outlook or Google Calendar under "Add from URL" and new events will appear on their own.</span>
+</p>
+{{- end }}
