@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
   schedule:
-    # Daily at 10:00 UTC (06:00 Toronto) so HISS Hub events imported from Outlook stay fresh.
+    # Daily at 10:00 UTC so HISS Hub events imported from Outlook stay fresh.
     - cron: "0 10 * * *"
   workflow_dispatch:
 
@@ -17,6 +17,11 @@ permissions:
 concurrency:
   group: pages
   cancel-in-progress: false
+
+env:
+  # A second branch published alongside the site at /next/ so two versions can be compared live.
+  # Set it to an empty string to stop publishing the preview.
+  PREVIEW_BRANCH: redesign/minimal
 
 jobs:
   build:
@@ -48,6 +53,26 @@ jobs:
 
       - name: Build
         run: hugo --gc --minify --baseURL "${{ steps.pages.outputs.base_url || 'https://example.org' }}/"
+
+      # Preview of a second branch at /next/. A failure here never blocks the main site.
+      - name: Check out the preview branch
+        if: env.PREVIEW_BRANCH != ''
+        id: preview
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.PREVIEW_BRANCH }}
+          path: next-src
+
+      - name: Build the preview into /next/
+        if: env.PREVIEW_BRANCH != '' && steps.preview.outcome == 'success'
+        continue-on-error: true
+        env:
+          HUGO_PARAMS_NOINDEX: "true"
+        run: |
+          uv run next-src/scripts/check_events.py
+          uv run next-src/scripts/import_ics.py || echo "::warning::Outlook import failed for the preview"
+          hugo -s next-src -d "$GITHUB_WORKSPACE/public/next" --gc --minify --baseURL "${{ steps.pages.outputs.base_url || 'https://example.org' }}/next/"
 
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'
