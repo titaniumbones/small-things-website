@@ -64,6 +64,10 @@ The site publishes iCalendar feeds anyone can subscribe to:
 - every event page has its own `calendar.ics` for "add to my calendar"
 - `/events.json`: the same data for scripts
 
+## Previewing another branch
+
+The deploy workflow can publish a second branch alongside the live site at `/next/`, so two versions can be compared in a browser. The branch name is the `PREVIEW_BRANCH` setting at the top of `.github/workflows/deploy.yml`. The preview carries a `noindex` tag so search engines ignore it, and a failure to build it never blocks the main site. Set the value to an empty string to stop publishing the preview, for example once the branch has been merged.
+
 ## Working locally
 
 You need [Hugo](https://gohugo.io/installation/) (extended edition) and [uv](https://docs.astral.sh/uv/).
