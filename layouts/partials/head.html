@@ -12,6 +12,9 @@
 <meta property="og:url" content="{{ .Permalink }}">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#ffffff">
+{{- if site.Params.noindex }}
+<meta name="robots" content="noindex">
+{{- end }}
 {{- range .AlternativeOutputFormats }}
 <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{ $.Title }}">
 {{- end }}
