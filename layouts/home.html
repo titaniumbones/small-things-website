@@ -26,10 +26,15 @@
       <p class="lede">{{ .body }}</p>
       <p class="actions"><a class="btn" href="{{ $mail }}">Propose an object</a></p>
     </div>
-    {{- with .facts }}
-    <dl class="facts-card">
-      {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value }}</dd></div>{{ end }}
-    </dl>
+    {{- with .departments }}
+    <div class="dept-card">
+      <p class="dept-label">{{ $.Params.pitch.departmentsLabel | default "The six departments" }}</p>
+      <ul class="dept-list">
+        {{- range $i, $d := . }}
+        <li><a href="{{ $d.url }}">{{ $d.name }}</a><span class="num">{{ printf "%02d" (add $i 1) }}</span></li>
+        {{- end }}
+      </ul>
+    </div>
     {{- end }}
   </div>
 </section>
@@ -37,12 +42,15 @@
 
 {{- with .Params.steps }}
 <section class="section section-line" id="how">
-  <div class="wrap">
-    <p class="eyebrow">How it works</p>
-    <h2 class="h-lg">From object to episode</h2>
-    <ol class="cards">
+  <div class="wrap two-col">
+    <div class="sticky">
+      <p class="eyebrow">How it works</p>
+      <h2 class="h-lg">From object to episode</h2>
+      {{ with $.Params.stepsLede }}<p class="lede">{{ . }}</p>{{ end }}
+    </div>
+    <ol class="steps-list">
       {{- range $i, $s := . }}
-      <li class="card"><span class="num" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span><h3>{{ $s.title }}</h3><p>{{ $s.body }}</p></li>
+      <li><span class="num" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span><div><h3>{{ $s.title }}</h3><p>{{ $s.body }}</p></div></li>
       {{- end }}
     </ol>
   </div>
