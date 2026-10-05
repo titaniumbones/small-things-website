@@ -1,8 +1,19 @@
 ---
 title: "Speakers' Corner"
+headline: "Fifteen minutes on something worth knowing."
 short: "Fifteen minutes on something worth knowing, from HCS faculty to HCS students."
 colour: "yellow"
 weight: 20
+outputs: ["calendar"]
+facts:
+  - label: "Length"
+    value: "Fifteen minutes"
+  - label: "Who"
+    value: "A faculty member from Historical and Cultural Studies"
+  - label: "For"
+    value: "HCS students, and anyone else who is curious"
+  - label: "Where"
+    value: "HCS; the room is on each event page"
 cascade:
   params:
     series: "speakers-corner"

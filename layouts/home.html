@@ -2,80 +2,74 @@
 {{ define "main" }}
 {{- $all := partial "all-events.html" site -}}
 {{- $now := now -}}
-{{- $upcoming := where $all "Date" "ge" $now -}}
-{{- $upcoming = where $upcoming "Params.status" "ne" "cancelled" -}}
-{{- $st := site.GetPage "/events/small-things" -}}
+{{- $upcoming := where (where $all "Date" "ge" $now) "Params.status" "ne" "cancelled" -}}
 {{- $stUpcoming := where $upcoming "Params.series" "small-things" -}}
 {{- $next := index $stUpcoming 0 -}}
-{{- $published := where (where $st.RegularPages "Params.audio" "ne" "") "Params.audio" "ne" nil -}}
-{{- $latest := index $published.ByDate.Reverse 0 -}}
+{{- $events := site.GetPage "/events" -}}
+{{- $what := site.GetPage "/what-we-do" -}}
+{{- $about := site.GetPage "/about" -}}
 
-<section class="hero">
-  <div class="hero-inner">
-    <p class="hero-kicker">A live-recorded podcast from the HISS Research Hub, UTSC</p>
-    <h1 class="hero-title"><span class="hero-small">Small</span><span class="hero-big">Things</span></h1>
-    <p class="hero-lede">One faculty guest. One object on the table. One hour to find out how much it can hold. Recorded live on campus at lunchtime, with pizza, and everyone is welcome.</p>
-    <p class="hero-actions">
-      {{ with $next }}<a class="button button-coral" href="{{ .RelPermalink }}">Next recording</a>{{ end }}
-      <a class="button button-ghost" href="{{ $st.RelPermalink }}">Episodes</a>
-      <a class="button button-ghost" href="{{ (site.GetPage "/calendar").RelPermalink }}">Calendar</a>
-    </p>
+<section class="hero wrap">
+  <p class="eyebrow">A live-recorded podcast from the HISS Research Hub, University of Toronto Scarborough</p>
+  <h1 class="display-xl">One object.<br>One guest.<br>One hour.</h1>
+  <div class="hero-foot">
+    <p class="lede">Small Things puts a single object on the table and asks a faculty member how much it can hold. Recorded live on campus at lunchtime, with pizza. Everyone is welcome.</p>
+    <p class="actions"><a class="btn btn-solid" href="{{ $what.RelPermalink }}">What we do</a><a class="btn" href="{{ $events.RelPermalink }}">All events</a></p>
   </div>
 </section>
 
 {{ with $next }}
-<section class="next-band">
-  <div class="band-inner">
-    <p class="band-label">Next recording</p>
-    <p class="band-date"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Monday 2 January" }}</time>{{ if eq (.Params.status | default "confirmed") "tbc" }} <span class="flag flag-tbc">date to be confirmed</span>{{ end }}</p>
-    <h2 class="band-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-    <p class="band-meta">{{ partial "event-when.html" . }}</p>
-    {{ with .Params.object }}<p class="band-object">The object: {{ . }}</p>{{ end }}
-  </div>
-</section>
-{{ end }}
-
-<section class="section">
-  <div class="section-inner">
-    <div class="section-head">
-      <h2>Coming up</h2>
-      <a class="more" href="{{ (site.GetPage "/calendar").RelPermalink }}">Full calendar</a>
+<section class="field field-accent">
+  <div class="wrap split">
+    <p class="eyebrow">Next recording{{ if eq (.Params.status | default "confirmed") "tbc" }} · date to be confirmed{{ end }}</p>
+    <div>
+      <p class="display-lg"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 January" }}</time></p>
+      <h2 class="field-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <p class="field-meta">{{ .Date.Format "Monday" }}, {{ partial "event-when.html" . }}{{ with .Params.object }} · The object: {{ . }}{{ end }}</p>
     </div>
-    {{- with first (site.Params.upcomingOnHome | default 5) $upcoming }}
-    <ul class="event-list">
-      {{- range . }}{{ partial "event-row.html" . }}{{ end }}
-    </ul>
-    {{- else }}
-    <p class="empty">Nothing scheduled yet. Subscribe to the calendar and you will hear when something is.</p>
-    {{- end }}
-    {{ partial "subscribe.html" site.Home }}
-  </div>
-</section>
-
-{{ with $latest }}
-<section class="section section-tint">
-  <div class="section-inner">
-    <div class="section-head"><h2>Latest episode</h2><a class="more" href="{{ $st.RelPermalink }}">All episodes</a></div>
-    <article class="episode-card">
-      <p class="ep-number">{{ if eq (int .Params.episode) 0 }}Pilot{{ else }}Episode {{ .Params.episode }}{{ end }}</p>
-      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-      {{ with .Params.object }}<p class="ep-object">The object: {{ . }}</p>{{ end }}
-      <audio controls preload="none" src="{{ .Params.audio }}"></audio>
-    </article>
   </div>
 </section>
 {{ end }}
 
-<section class="section">
-  <div class="section-inner series-grid">
-    {{- range (site.GetPage "/events").Sections.ByWeight }}
-    <article class="series-card series-{{ .Params.colour }}">
-      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-      <p>{{ .Params.short }}</p>
-      {{- $n := len (where $upcoming "Params.series" .Params.series) }}
-      <p class="series-count">{{ if eq $n 0 }}No dates yet{{ else if eq $n 1 }}1 upcoming event{{ else }}{{ $n }} upcoming events{{ end }}</p>
-    </article>
-    {{- end }}
+<section class="band">
+  <div class="wrap split">
+    <div>
+      <p class="eyebrow">Coming up</p>
+      <p><a class="btn" href="{{ $events.RelPermalink }}">All events</a></p>
+    </div>
+    <div>
+      {{- with first (site.Params.upcomingOnHome | default 3) $upcoming }}
+      <ul class="event-list">
+        {{- range . }}{{ partial "event-row.html" . }}{{ end }}
+      </ul>
+      {{- else }}
+      <p class="muted">Nothing scheduled yet. Subscribe to the calendar and you will hear when something is.</p>
+      {{- end }}
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <p class="eyebrow">Three series</p>
+    <ol class="numbered">
+      {{- range $i, $s := $events.Sections.ByWeight }}
+      <li>
+        <span class="num">{{ printf "%02d" (add $i 1) }}</span>
+        <h2><a href="{{ $what.RelPermalink }}#{{ $s.Params.series }}">{{ $s.Title }}</a></h2>
+        <p>{{ $s.Params.short }}</p>
+        {{- $n := len (where $upcoming "Params.series" $s.Params.series) }}
+        <span class="num">{{ if eq $n 0 }}No dates yet{{ else if eq $n 1 }}1 upcoming{{ else }}{{ $n }} upcoming{{ end }}</span>
+      </li>
+      {{- end }}
+    </ol>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <p class="display-md statement">Come for the object. Stay to find out what research in the humanities looks like up close, and how to get involved in it.</p>
+    <p><a class="btn" href="{{ $about.RelPermalink }}">About us</a></p>
   </div>
 </section>
 {{ end }}

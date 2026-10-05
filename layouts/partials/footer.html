@@ -1,32 +1,43 @@
 <footer class="site-footer">
-  <div class="footer-grid">
-    <div>
-      <p class="footer-lede">Small Things is a live-recorded podcast from the <a href="{{ site.Params.hubUrl }}">{{ site.Params.hubName }}</a> at the University of Toronto Scarborough.</p>
-      <p>Supported by a Research for Inclusive Excellence grant and the six founding departments of the HISS Hub.</p>
+  <div class="wrap">
+    <p class="footer-mark" aria-hidden="true">Small Things</p>
+    <div class="footer-grid">
+      <div>
+        <p class="footer-heading">Small Things</p>
+        <p>A live-recorded podcast from the <a href="{{ site.Params.hubUrl }}">{{ site.Params.hubName }}</a> at the University of Toronto Scarborough. Supported by a Research for Inclusive Excellence grant and the six founding departments of the HISS Hub.</p>
+      </div>
+      <div>
+        <p class="footer-heading">Pages</p>
+        <ul class="footer-list">
+          {{- range site.Menus.main }}
+          <li><a href="{{ .URL }}">{{ .Name }}</a></li>
+          {{- end }}
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Subscribe</p>
+        <ul class="footer-list">
+          {{- with site.Home.OutputFormats.Get "calendar" }}
+          <li><a href="{{ .Permalink }}">All events (.ics)</a></li>
+          {{- end }}
+          {{- range (site.GetPage "/events").Sections.ByWeight }}
+          {{- $t := .Title }}
+          {{- with .OutputFormats.Get "calendar" }}
+          <li><a href="{{ .Permalink }}">{{ $t }} (.ics)</a></li>
+          {{- end }}
+          {{- end }}
+        </ul>
+      </div>
+      <div>
+        <p class="footer-heading">Elsewhere</p>
+        <ul class="footer-list">
+          <li><a href="{{ site.Params.hubUrl }}">HISS Research Hub</a></li>
+          <li><a href="{{ site.Params.hcsUrl }}">Historical and Cultural Studies</a></li>
+          <li><a href="{{ site.Params.utscUrl }}">University of Toronto Scarborough</a></li>
+          <li><a href="mailto:{{ site.Params.contactEmail }}">Email the host</a></li>
+        </ul>
+      </div>
     </div>
-    <div>
-      <p class="footer-heading">Subscribe</p>
-      <ul class="footer-list">
-        {{- with site.Home.OutputFormats.Get "calendar" }}
-        <li><a href="{{ .Permalink }}">All events (.ics)</a></li>
-        {{- end }}
-        {{- range (site.GetPage "/events").Sections.ByWeight }}
-        {{- $t := .Title }}
-        {{- with .OutputFormats.Get "calendar" }}
-        <li><a href="{{ .Permalink }}">{{ $t }} (.ics)</a></li>
-        {{- end }}
-        {{- end }}
-      </ul>
-    </div>
-    <div>
-      <p class="footer-heading">Elsewhere</p>
-      <ul class="footer-list">
-        <li><a href="{{ site.Params.hubUrl }}">HISS Research Hub</a></li>
-        <li><a href="{{ site.Params.hcsUrl }}">Historical and Cultural Studies</a></li>
-        <li><a href="{{ site.Params.utscUrl }}">University of Toronto Scarborough</a></li>
-        <li><a href="mailto:{{ site.Params.contactEmail }}">Email the host</a></li>
-      </ul>
-    </div>
+    <p class="footer-fine">Built with Hugo. Events are edited on <a href="{{ site.Params.repoUrl }}">GitHub</a>. HISS Hub events are drawn from the Hub's shared calendar.</p>
   </div>
-  <p class="footer-fine">Built with Hugo. Events are edited on <a href="https://github.com/titaniumbones/small-things-website">GitHub</a>. HISS Hub events are drawn from the Hub's shared calendar.</p>
 </footer>

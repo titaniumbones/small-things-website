@@ -1,11 +1,12 @@
-<header class="site-header">
-  <a class="wordmark" href="{{ "/" | relURL }}" aria-label="Small Things home">
-    <span class="wordmark-small">Small</span><span class="wordmark-big">Things</span>
-  </a>
-  <nav class="site-nav" aria-label="Main">
-    {{- $current := . }}
-    {{- range site.Menus.main }}
-    <a href="{{ .URL }}"{{ if or ($current.IsMenuCurrent "main" .) ($current.HasMenuCurrent "main" .) }} aria-current="page"{{ end }}>{{ .Name }}</a>
-    {{- end }}
-  </nav>
+<header class="top">
+  <div class="wrap top-inner">
+    <a class="wordmark" href="{{ "/" | relURL }}" aria-label="Small Things home"><span class="wordmark-dot" aria-hidden="true"></span>Small Things</a>
+    <nav class="nav" aria-label="Main">
+      {{- $current := . }}
+      {{- range site.Menus.main }}
+      {{- $here := or ($current.IsMenuCurrent "main" .) ($current.HasMenuCurrent "main" .) }}
+      <a href="{{ .URL }}"{{ if eq .Identifier "contact" }} class="nav-contact"{{ end }}{{ if $here }} aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{- end }}
+    </nav>
+  </div>
 </header>

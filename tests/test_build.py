@@ -22,18 +22,19 @@ def site(tmp_path_factory):
 def test_pages_exist(site):
     for rel in [
         "index.html",
-        "calendar/index.html",
         "about/index.html",
-        "events/small-things/index.html",
-        "events/speakers-corner/index.html",
-        "events/hiss/index.html",
+        "events/index.html",
+        "what-we-do/index.html",
+        "contact/index.html",
+        "calendar/index.html",  # alias redirect to /events/
+        "events/small-things/2026-02-05-bhavani-raman/index.html",
     ]:
         assert (site / rel).exists(), rel
 
 
 def test_feeds_exist_and_parse(site):
     icalendar = pytest.importorskip("icalendar")
-    for rel in ["calendar.ics", "events/small-things/calendar.ics", "events/speakers-corner/calendar.ics"]:
+    for rel in ["calendar.ics", "events/calendar.ics", "events/small-things/calendar.ics", "events/speakers-corner/calendar.ics"]:
         raw = (site / rel).read_bytes()
         assert b"\r\n" in raw, f"{rel} should use CRLF line endings"
         cal = icalendar.Calendar.from_ical(raw)
@@ -52,3 +53,15 @@ def test_home_links_to_feed(site):
     html = (site / "index.html").read_text()
     assert 'type="text/calendar"' in html
     assert "calendar.ics" in html
+
+
+def test_series_pages_have_no_html(site):
+    # Series are listed on /events/ and /what-we-do/; each series keeps only its .ics feed.
+    for rel in ["events/small-things/index.html", "events/speakers-corner/index.html", "events/hiss/index.html"]:
+        assert not (site / rel).exists(), rel
+
+
+def test_nav_has_the_four_pages(site):
+    html = (site / "index.html").read_text()
+    for name in ("About Us", "Events", "What we do", "Contact"):
+        assert name in html, name

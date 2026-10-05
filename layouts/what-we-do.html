@@ -1,0 +1,64 @@
+{{ define "bodyclass" }}what-we-do{{ end }}
+{{ define "main" }}
+{{- $events := site.GetPage "/events" -}}
+<section class="page-hero wrap">
+  <p class="eyebrow">{{ .Params.eyebrow | default site.Title }}</p>
+  <h1 class="display-xl">{{ .Title }}</h1>
+  {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <ol class="numbered">
+      {{- range $i, $s := $events.Sections.ByWeight }}
+      <li>
+        <span class="num">{{ printf "%02d" (add $i 1) }}</span>
+        <h2><a href="#{{ $s.Params.series }}">{{ $s.Title }}</a></h2>
+        <p>{{ $s.Params.short }}</p>
+        <span class="num"><a href="#{{ $s.Params.series }}">Read on</a></span>
+      </li>
+      {{- end }}
+    </ol>
+  </div>
+</section>
+
+{{- range $i, $s := $events.Sections.ByWeight }}
+<section class="band series-block" id="{{ $s.Params.series }}">
+  <div class="wrap split">
+    <div class="sticky">
+      <p class="eyebrow">{{ printf "%02d" (add $i 1) }} · {{ $s.Title }}</p>
+      <p><a class="btn" href="{{ $events.RelPermalink }}#{{ $s.Params.series }}">Upcoming {{ $s.Title }} events</a></p>
+    </div>
+    <div>
+      <h2 class="series-head">{{ $s.Params.headline | default $s.Params.short }}</h2>
+      <div class="prose">{{ $s.Content }}</div>
+      {{- with $s.Params.facts }}
+      <dl class="facts">
+        {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value | markdownify }}</dd></div>{{ end }}
+      </dl>
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+
+{{- with .Params.takePart }}
+<section class="band" id="take-part">
+  <div class="wrap">
+    <p class="eyebrow">Take part</p>
+    <div class="columns">
+      {{- range . }}
+      <div>
+        <p class="eyebrow">{{ .label }}</p>
+        <h2 class="column-head">{{ .title }}</h2>
+        <div class="prose">{{ .body | markdownify }}</div>
+      </div>
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+{{- with .Content }}
+<section class="band"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
+{{- end }}
+{{ end }}

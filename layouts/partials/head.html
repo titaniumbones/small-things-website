@@ -2,12 +2,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {{- $title := .Title -}}
 {{- if .IsHome }}{{ $title = printf "%s: a live-recorded podcast from UTSC" site.Title }}{{ else }}{{ $title = printf "%s | %s" .Title site.Title }}{{ end -}}
+{{- $desc := or .Description .Params.short site.Params.description -}}
 <title>{{ $title }}</title>
-<meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ with .Params.short }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}{{ end }}">
+<meta name="description" content="{{ $desc }}">
+<meta property="og:site_name" content="{{ site.Title }}">
 <meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $desc }}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ .Permalink }}">
-<meta name="theme-color" content="#1e3765">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#faf9f6">
 {{- range .AlternativeOutputFormats }}
 <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{ $.Title }}">
 {{- end }}
