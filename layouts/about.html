@@ -1,19 +1,20 @@
 {{ define "bodyclass" }}about{{ end }}
 {{ define "main" }}
-<section class="page-hero wrap">
-  <p class="eyebrow">{{ .Params.eyebrow | default site.Title }}</p>
-  <h1 class="display-xl">{{ .Title }}</h1>
-  {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
+<section class="mast wrap">
+  <p class="mast-kicker"><span>{{ .Params.eyebrow | default site.Title }}</span></p>
+  <h1 class="mast-title mast-title-sm">{{ .Title }}</h1>
+  <div class="mast-rule"></div>
+  {{ with .Params.lede }}<p class="mast-lede mast-lede-wide">{{ . }}</p>{{ end }}
 </section>
 {{- range .Params.sections }}
-<section class="band">
-  <div class="wrap split">
-    <h2 class="eyebrow">{{ .label }}</h2>
+<section class="sec">
+  <div class="wrap split-sec">
+    <h2 class="poster-h3">{{ .label }}</h2>
     <div class="prose">{{ .body | markdownify }}</div>
   </div>
 </section>
 {{- end }}
 {{- with .Content }}
-<section class="band"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
+<section class="sec"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
 {{- end }}
 {{ end }}

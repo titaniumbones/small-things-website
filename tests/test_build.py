@@ -34,11 +34,13 @@ def test_pages_exist(site):
 
 def test_feeds_exist_and_parse(site):
     icalendar = pytest.importorskip("icalendar")
-    for rel in ["calendar.ics", "events/calendar.ics", "events/small-things/calendar.ics", "events/speakers-corner/calendar.ics"]:
+    # Every feed must exist and parse; a series with nothing scheduled yet publishes an empty feed.
+    for rel in ["calendar.ics", "events/calendar.ics", "events/small-things/calendar.ics", "events/speakers-corner/calendar.ics", "events/hiss/calendar.ics"]:
         raw = (site / rel).read_bytes()
         assert b"\r\n" in raw, f"{rel} should use CRLF line endings"
-        cal = icalendar.Calendar.from_ical(raw)
-        assert cal.walk("VEVENT"), f"{rel} has no events"
+        icalendar.Calendar.from_ical(raw)
+    all_events = icalendar.Calendar.from_ical((site / "calendar.ics").read_bytes())
+    assert all_events.walk("VEVENT"), "calendar.ics has no events"
 
 
 def test_events_json(site):
@@ -65,3 +67,14 @@ def test_nav_has_the_four_pages(site):
     html = (site / "index.html").read_text()
     for name in ("About Us", "Events", "What we do", "Contact"):
         assert name in html, name
+
+
+def test_events_page_says_coming_soon_when_nothing_is_scheduled(site):
+    html = (site / "events/index.html").read_text()
+    assert "Coming soon" in html
+
+
+def test_home_pitches_guests(site):
+    html = (site / "index.html").read_text()
+    assert "Propose an object" in html
+    assert "mailto:" in html

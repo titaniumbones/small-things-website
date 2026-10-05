@@ -3,53 +3,43 @@
 {{- $all := partial "all-events.html" site -}}
 {{- $now := now -}}
 {{- $upcoming := where $all "Date" "ge" $now -}}
-{{- $past := (where $all "Date" "lt" $now).Reverse -}}
-<section class="page-hero wrap">
-  <p class="eyebrow">Small Things · Speakers' Corner · HISS Hub</p>
-  <h1 class="display-xl">{{ .Title }}</h1>
-  <div class="lede">{{ .Content }}</div>
+<section class="mast wrap">
+  <p class="mast-kicker"><span>Small Things · Speakers' Corner · HISS Hub</span><span>{{ now.Format "2006" }}–{{ (now.AddDate 1 0 0).Format "06" }}</span></p>
+  <h1 class="mast-title mast-title-sm">{{ .Title }}</h1>
+  <div class="mast-rule"></div>
 </section>
 
-<section class="band">
-  <div class="wrap">
-    <div class="filters" data-filters>
-      <span class="filters-label">Show</span>
-      <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">Everything</button>
-      {{- range .Sections.ByWeight }}
-      <button type="button" class="filter" data-filter="{{ .Params.series }}" aria-pressed="false">{{ .Title }}</button>
-      {{- end }}
-    </div>
-    {{- with $upcoming }}
-    <div data-event-groups>{{ partial "month-list.html" (dict "pages" .) }}</div>
-    <p class="muted" data-empty hidden>Nothing in this series is scheduled yet.</p>
-    {{- else }}
-    <p class="muted">Nothing scheduled yet.</p>
+{{- with $upcoming }}
+<section class="wrap list-wrap">
+  <div class="filters" data-filters>
+    <span class="filters-label">Show</span>
+    <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">Everything</button>
+    {{- range $.Sections.ByWeight }}
+    <button type="button" class="filter" data-filter="{{ .Params.series }}" aria-pressed="false">{{ .Title }}</button>
     {{- end }}
   </div>
+  <div data-event-groups>{{ partial "month-list.html" (dict "pages" .) }}</div>
+  <p class="muted-note" data-empty hidden>Nothing in this series is scheduled yet.</p>
 </section>
-
-<section class="band">
-  <div class="wrap split">
-    <h2 class="eyebrow">Subscribe</h2>
-    <div class="prose">
-      <p>Paste a link into Outlook or Google Calendar under "Add from URL" and new events appear in your own calendar on their own.</p>
-      <ul class="plain-list">
-        {{- with site.Home.OutputFormats.Get "calendar" }}<li><a href="{{ .Permalink }}">All events (.ics)</a></li>{{ end }}
-        {{- range .Sections.ByWeight }}{{ $t := .Title }}{{ with .OutputFormats.Get "calendar" }}<li><a href="{{ .Permalink }}">{{ $t }} only (.ics)</a></li>{{ end }}{{ end }}
-      </ul>
-      <p class="muted">HISS Hub events come from the Hub's shared Outlook calendar and refresh once a day. To change one, change it there.</p>
-    </div>
-  </div>
-</section>
-
-{{- with $past }}
-<section class="band">
-  <div class="wrap">
-    <details class="past">
-      <summary>Show {{ len . }} past event{{ if ne (len .) 1 }}s{{ end }}</summary>
-      <div data-event-groups>{{ partial "month-list.html" (dict "pages" . "order" "desc") }}</div>
-    </details>
-  </div>
+{{- else }}
+<section class="wrap notice-wrap">
+  <p class="notice">{{ .Params.notice | default "Coming soon… to be announced!" }}</p>
+  <div class="prose prose-lg">{{ .Content }}</div>
 </section>
 {{- end }}
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head"><p class="kicker">Subscribe</p><h2 class="poster-h2">Get the dates the moment they land</h2></div>
+    <div class="cols cols-4">
+      {{- with site.Home.OutputFormats.Get "calendar" }}
+      <div class="col"><p class="kicker">All</p><h3 class="col-title"><a href="{{ .Permalink }}">Every event (.ics)</a></h3><p>All three series in one feed.</p></div>
+      {{- end }}
+      {{- range .Sections.ByWeight }}{{ $s := . }}{{ with .OutputFormats.Get "calendar" }}
+      <div class="col"><p class="kicker">{{ $s.Title }}</p><h3 class="col-title"><a href="{{ .Permalink }}">{{ $s.Title }} only (.ics)</a></h3><p>{{ $s.Params.short }}</p></div>
+      {{- end }}{{ end }}
+    </div>
+    <p class="muted-note">Paste a link into Outlook or Google Calendar under "Add from URL". HISS Hub events come from the Hub's shared Outlook calendar and refresh once a day.</p>
+  </div>
+</section>
 {{ end }}

@@ -1,13 +1,14 @@
 {{ define "bodyclass" }}what-we-do{{ end }}
 {{ define "main" }}
 {{- $events := site.GetPage "/events" -}}
-<section class="page-hero wrap">
-  <p class="eyebrow">{{ .Params.eyebrow | default site.Title }}</p>
-  <h1 class="display-xl">{{ .Title }}</h1>
-  {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
+<section class="mast wrap">
+  <p class="mast-kicker"><span>{{ .Params.eyebrow | default site.Title }}</span></p>
+  <h1 class="mast-title mast-title-sm">{{ .Title }}</h1>
+  <div class="mast-rule"></div>
+  {{ with .Params.lede }}<p class="mast-lede mast-lede-wide">{{ . }}</p>{{ end }}
 </section>
 
-<section class="band">
+<section class="sec">
   <div class="wrap">
     <ol class="numbered">
       {{- range $i, $s := $events.Sections.ByWeight }}
@@ -23,34 +24,36 @@
 </section>
 
 {{- range $i, $s := $events.Sections.ByWeight }}
-<section class="band series-block" id="{{ $s.Params.series }}">
-  <div class="wrap split">
-    <div class="sticky">
-      <p class="eyebrow">{{ printf "%02d" (add $i 1) }} · {{ $s.Title }}</p>
-      <p><a class="btn" href="{{ $events.RelPermalink }}#{{ $s.Params.series }}">Upcoming {{ $s.Title }} events</a></p>
-    </div>
-    <div>
-      <h2 class="series-head">{{ $s.Params.headline | default $s.Params.short }}</h2>
-      <div class="prose">{{ $s.Content }}</div>
-      {{- with $s.Params.facts }}
-      <dl class="facts">
-        {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value | markdownify }}</dd></div>{{ end }}
-      </dl>
-      {{- end }}
+<section class="sec{{ if eq $i 1 }} inv{{ end }}" id="{{ $s.Params.series }}">
+  <div class="wrap">
+    <div class="sec-head"><p class="kicker">{{ printf "%02d" (add $i 1) }}</p><h2 class="poster-h2">{{ $s.Title }}</h2></div>
+    <div class="split-sec">
+      <div>
+        <p class="series-head">{{ $s.Params.headline | default $s.Params.short }}</p>
+        <p class="cta-row"><a class="cta cta-outline" href="{{ $events.RelPermalink }}#{{ $s.Params.series }}">Upcoming events</a></p>
+      </div>
+      <div>
+        <div class="prose">{{ $s.Content }}</div>
+        {{- with $s.Params.facts }}
+        <dl class="facts">
+          {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value | markdownify }}</dd></div>{{ end }}
+        </dl>
+        {{- end }}
+      </div>
     </div>
   </div>
 </section>
 {{- end }}
 
 {{- with .Params.takePart }}
-<section class="band" id="take-part">
+<section class="sec" id="take-part">
   <div class="wrap">
-    <p class="eyebrow">Take part</p>
-    <div class="columns">
+    <div class="sec-head"><p class="kicker">Take part</p><h2 class="poster-h2">Three ways in</h2></div>
+    <div class="cols cols-3">
       {{- range . }}
-      <div>
-        <p class="eyebrow">{{ .label }}</p>
-        <h2 class="column-head">{{ .title }}</h2>
+      <div class="col">
+        <p class="kicker">{{ .label }}</p>
+        <h3 class="col-title">{{ .title }}</h3>
         <div class="prose">{{ .body | markdownify }}</div>
       </div>
       {{- end }}
@@ -59,6 +62,6 @@
 </section>
 {{- end }}
 {{- with .Content }}
-<section class="band"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
+<section class="sec"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
 {{- end }}
 {{ end }}

@@ -3,73 +3,85 @@
 {{- $all := partial "all-events.html" site -}}
 {{- $now := now -}}
 {{- $upcoming := where (where $all "Date" "ge" $now) "Params.status" "ne" "cancelled" -}}
-{{- $stUpcoming := where $upcoming "Params.series" "small-things" -}}
-{{- $next := index $stUpcoming 0 -}}
 {{- $events := site.GetPage "/events" -}}
 {{- $what := site.GetPage "/what-we-do" -}}
 {{- $about := site.GetPage "/about" -}}
+{{- $st := site.GetPage "/events/small-things" -}}
+{{- $pilot := "" -}}{{- with $st }}{{ $pilot = index (where .RegularPages "Params.episode" 0) 0 }}{{ end -}}
+{{- $mail := printf "mailto:%s?subject=%s" site.Params.contactEmail (replace (urlquery "Small Things: an object") "+" "%20") -}}
 
-<section class="hero wrap">
-  <p class="eyebrow">A live-recorded podcast from the HISS Research Hub, University of Toronto Scarborough</p>
-  <h1 class="display-xl">One object.<br>One guest.<br>One hour.</h1>
-  <div class="hero-foot">
-    <p class="lede">Small Things puts a single object on the table and asks a faculty member how much it can hold. Recorded live on campus at lunchtime, with pizza. Everyone is welcome.</p>
-    <p class="actions"><a class="btn btn-solid" href="{{ $what.RelPermalink }}">What we do</a><a class="btn" href="{{ $events.RelPermalink }}">All events</a></p>
-  </div>
-</section>
-
-{{ with $next }}
-<section class="field field-accent">
-  <div class="wrap split">
-    <p class="eyebrow">Next recording{{ if eq (.Params.status | default "confirmed") "tbc" }} · date to be confirmed{{ end }}</p>
-    <div>
-      <p class="display-lg"><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 January" }}</time></p>
-      <h2 class="field-title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-      <p class="field-meta">{{ .Date.Format "Monday" }}, {{ partial "event-when.html" . }}{{ with .Params.object }} · The object: {{ . }}{{ end }}</p>
+<section class="mast wrap">
+  <p class="mast-kicker"><span>{{ .Params.kicker }}</span><span>Est. 2026</span></p>
+  <h1 class="mast-title"><span>Small</span><span>Things</span></h1>
+  <div class="mast-rule"></div>
+  <div class="mast-grid">
+    <p class="mast-lede">{{ .Params.lede }}</p>
+    <div class="cta-list">
+      <a class="cta" href="{{ $mail }}">Propose an object</a>
+      <a class="cta cta-outline" href="{{ $events.RelPermalink }}">Come to a recording</a>
+      {{ with $pilot }}<a class="cta cta-outline" href="{{ .RelPermalink }}">About the pilot</a>{{ end }}
     </div>
   </div>
 </section>
-{{ end }}
 
-<section class="band">
-  <div class="wrap split">
+{{- with .Params.pitch }}
+<section class="inv" id="guests">
+  <div class="wrap pitch">
     <div>
-      <p class="eyebrow">Coming up</p>
-      <p><a class="btn" href="{{ $events.RelPermalink }}">All events</a></p>
-    </div>
-    <div>
-      {{- with first (site.Params.upcomingOnHome | default 3) $upcoming }}
-      <ul class="event-list">
-        {{- range . }}{{ partial "event-row.html" . }}{{ end }}
-      </ul>
-      {{- else }}
-      <p class="muted">Nothing scheduled yet. Subscribe to the calendar and you will hear when something is.</p>
+      <p class="kicker">For faculty</p>
+      <h2 class="poster-h2">{{ .heading }}</h2>
+      <div class="prose prose-lg">{{ .body | markdownify }}</div>
+      {{- with .points }}
+      <ul class="points">{{ range . }}<li>{{ . }}</li>{{ end }}</ul>
       {{- end }}
+      <p class="cta-row"><a class="cta" href="{{ $mail }}">Propose an object</a><a class="cta cta-outline" href="{{ $about.RelPermalink }}">Who we are</a></p>
     </div>
+    <div class="object" aria-hidden="true"><span>Your object here</span></div>
   </div>
 </section>
+{{- end }}
 
-<section class="band">
+{{- with .Params.steps }}
+<section class="sec" id="how">
   <div class="wrap">
-    <p class="eyebrow">Three series</p>
-    <ol class="numbered">
-      {{- range $i, $s := $events.Sections.ByWeight }}
-      <li>
-        <span class="num">{{ printf "%02d" (add $i 1) }}</span>
-        <h2><a href="{{ $what.RelPermalink }}#{{ $s.Params.series }}">{{ $s.Title }}</a></h2>
-        <p>{{ $s.Params.short }}</p>
-        {{- $n := len (where $upcoming "Params.series" $s.Params.series) }}
-        <span class="num">{{ if eq $n 0 }}No dates yet{{ else if eq $n 1 }}1 upcoming{{ else }}{{ $n }} upcoming{{ end }}</span>
-      </li>
+    <div class="sec-head"><p class="kicker">How it works</p><h2 class="poster-h2">From object to episode in four steps</h2></div>
+    <ol class="steps">
+      {{- range $i, $s := . }}
+      <li><span class="step-num" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span><h3>{{ $s.title }}</h3><p>{{ $s.body }}</p></li>
       {{- end }}
     </ol>
   </div>
 </section>
+{{- end }}
 
-<section class="band">
+<section class="sec" id="season">
+  <div class="wrap season">
+    <div><p class="kicker">Recordings</p><h2 class="poster-h2">{{ .Params.season.heading | default "Season one" }}</h2></div>
+    <div>
+      {{- with first 3 $upcoming }}
+      <ul class="event-list">{{ range . }}{{ partial "event-row.html" . }}{{ end }}</ul>
+      {{- else }}
+      <p class="season-body">{{ $.Params.season.body }}</p>
+      {{- end }}
+      {{- with $pilot }}<p class="season-pilot">The pilot was recorded on {{ .Date.Format "2 January 2006" }}{{ with .Params.speakers }} with {{ delimit . ", " " and " }}{{ end }}. <a href="{{ .RelPermalink }}">About the pilot</a></p>{{ end }}
+      <p class="cta-row">{{ with site.Home.OutputFormats.Get "calendar" }}<a class="cta" href="{{ .Permalink }}">Subscribe to the calendar</a>{{ end }}<a class="cta cta-outline" href="{{ $events.RelPermalink }}">All events</a></p>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="series">
   <div class="wrap">
-    <p class="display-md statement">Come for the object. Stay to find out what research in the humanities looks like up close, and how to get involved in it.</p>
-    <p><a class="btn" href="{{ $about.RelPermalink }}">About us</a></p>
+    <div class="sec-head"><p class="kicker">Also from the Hub</p><h2 class="poster-h2">Three series, one calendar</h2></div>
+    <div class="cols cols-3">
+      {{- range $i, $s := $events.Sections.ByWeight }}
+      <div class="col">
+        <p class="kicker">{{ printf "%02d" (add $i 1) }}</p>
+        <h3 class="col-title"><a href="{{ $what.RelPermalink }}#{{ $s.Params.series }}">{{ $s.Title }}</a></h3>
+        <p>{{ $s.Params.short }}</p>
+      </div>
+      {{- end }}
+    </div>
+    <p class="cta-row"><a class="cta cta-outline" href="{{ $what.RelPermalink }}">What we do</a></p>
   </div>
 </section>
 {{ end }}

@@ -80,11 +80,12 @@ make build      # production build into public/
 
 ## How it is put together
 
-Five pages: home, **About Us**, **Events**, **What we do** and **Contact**. The look is type-led and minimal: off-white ground, near-black type, coral as the one accent, no photographs.
+Five pages: home, **About Us**, **Events**, **What we do** and **Contact**. The look is poster and broadsheet: white paper, near-black type set heavy and condensed, thick rules, a few inverted black blocks, and a circle standing for the object on the table. No photographs. The home page is the pitch to prospective guests; its copy lives in the front matter of `content/_index.md`.
 
 - `hugo.toml`: site settings, the menu, contact details, the Outlook feed URL, and the custom `.ics` and `.json` output formats.
 - `layouts/`: templates. `home.html`, `about.html`, `what-we-do.html`, `contact.html`, `events/section.html` (the Events list with its series filter), `events/page.html` (one event), and the `*.calendar.ics` and `home.eventsjson.json` feed templates. Shared pieces live in `layouts/partials/`.
 - `content/about.md`, `content/what-we-do.md`, `content/contact.md`: page copy. About Us and the "Take part" block are lists of labelled sections in the front matter; each `body` is Markdown.
+- `content/events/_index.md`: the Events page. When nothing is scheduled it shows the `notice` ("Coming soon… to be announced!") instead of a list, and past events are not listed.
 - `content/events/<series>/_index.md`: each series' description, one-line `short`, `headline`, and the `facts` shown on What we do. Series pages have no HTML of their own; they are listed on Events and What we do and keep only their `.ics` feed.
 - `assets/scss/main.scss`: all styles. Colours and type are set as variables at the top. Hugo compiles it; there is no npm.
 - `assets/js/site.js`: the Events page's series filter. The page works without it.
@@ -96,4 +97,4 @@ Five pages: home, **About Us**, **Events**, **What we do** and **Contact**. The 
 
 ## Colours
 
-The ground is off-white `#faf9f6` and type is near-black `#121212`. Coral `#ff5c39` is the single accent: buttons, the "next recording" field, and the Small Things dot. Speakers' Corner yellow `#f5c400` and HISS Hub teal `#007fa3` appear only as the small dot beside a series name; the name is always written out. The University of Toronto blue `#1e3765` is kept for the footer.
+Black and white, with one accent. Paper is `#ffffff`, ink is `#0b0b0b`. University of Toronto blue `#1e3765` is the only colour and is reserved for links and hover states on buttons, so a visitor's eye is pulled to exactly one thing at a time. Series are told apart by their written name, never by colour.

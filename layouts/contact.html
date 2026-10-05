@@ -1,56 +1,61 @@
 {{ define "bodyclass" }}contact{{ end }}
 {{ define "main" }}
-<section class="page-hero wrap">
-  <p class="eyebrow">{{ .Params.eyebrow | default site.Title }}</p>
-  <h1 class="display-xl">{{ .Title }}</h1>
-  {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
+{{- $mail := printf "mailto:%s?subject=%s" site.Params.contactEmail (replace (urlquery "Small Things") "+" "%20") -}}
+<section class="mast wrap">
+  <p class="mast-kicker"><span>{{ .Params.eyebrow | default site.Title }}</span></p>
+  <h1 class="mast-title mast-title-sm">{{ .Title }}</h1>
+  <div class="mast-rule"></div>
+  {{ with .Params.lede }}<p class="mast-lede mast-lede-wide">{{ . }}</p>{{ end }}
 </section>
 
-<section class="band">
-  <div class="wrap split">
-    <h2 class="eyebrow">Email</h2>
+<section class="sec">
+  <div class="wrap split-sec">
+    <h2 class="poster-h3">Email</h2>
     <div class="prose">
-      <p class="display-md"><a href="mailto:{{ site.Params.contactEmail }}">{{ site.Params.contactEmail }}</a></p>
+      <p class="contact-email"><a href="{{ $mail }}">{{ site.Params.contactEmail }}</a></p>
       <p>{{ site.Params.hostName }} hosts Small Things. Write about being a guest, giving a Speakers' Corner talk, working on the show, or anything else.</p>
+      <p class="cta-row"><a class="cta" href="{{ $mail }}">Propose an object</a></p>
     </div>
   </div>
 </section>
 
-<section class="band">
-  <div class="wrap split">
-    <h2 class="eyebrow">Where</h2>
+<section class="sec">
+  <div class="wrap split-sec">
+    <h2 class="poster-h3">Where</h2>
     <div class="prose">
       <p>Small Things is recorded in {{ site.Params.recordingRoom }} at the University of Toronto Scarborough, {{ site.Params.campusAddress }}. Speakers' Corner is in Historical and Cultural Studies; the room is on each event page.</p>
     </div>
   </div>
 </section>
 
-<section class="band">
-  <div class="wrap split">
-    <h2 class="eyebrow">Calendar</h2>
-    <div class="prose">
-      <p>Subscribe and new events appear in your own calendar. Paste a link into Outlook or Google Calendar under "Add from URL".</p>
-      <ul class="plain-list">
-        {{- with site.Home.OutputFormats.Get "calendar" }}<li><a href="{{ .Permalink }}">All events (.ics)</a></li>{{ end }}
-        {{- range (site.GetPage "/events").Sections.ByWeight }}{{ $t := .Title }}{{ with .OutputFormats.Get "calendar" }}<li><a href="{{ .Permalink }}">{{ $t }} only (.ics)</a></li>{{ end }}{{ end }}
-      </ul>
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head"><p class="kicker">Calendar</p><h2 class="poster-h2">Subscribe once, never miss a date</h2></div>
+    <div class="cols cols-4">
+      {{- with site.Home.OutputFormats.Get "calendar" }}
+      <div class="col"><p class="kicker">All</p><h3 class="col-title"><a href="{{ .Permalink }}">Every event (.ics)</a></h3></div>
+      {{- end }}
+      {{- range (site.GetPage "/events").Sections.ByWeight }}{{ $s := . }}{{ with .OutputFormats.Get "calendar" }}
+      <div class="col"><p class="kicker">{{ $s.Title }}</p><h3 class="col-title"><a href="{{ .Permalink }}">{{ $s.Title }} only (.ics)</a></h3></div>
+      {{- end }}{{ end }}
     </div>
+    <p class="muted-note">Paste a link into Outlook or Google Calendar under "Add from URL".</p>
   </div>
 </section>
 
-<section class="band">
-  <div class="wrap split">
-    <h2 class="eyebrow">Add an event</h2>
+<section class="sec">
+  <div class="wrap split-sec">
+    <h2 class="poster-h3">Add an event</h2>
     <div class="prose">
       <p>Colleagues and students add Small Things and Speakers' Corner events by editing one file on GitHub, in the browser. The README explains it in five steps.</p>
-      <p><a class="btn" href="{{ site.Params.repoUrl }}#readme">Open the README</a></p>
+      <p class="cta-row"><a class="cta cta-outline" href="{{ site.Params.repoUrl }}#readme">Open the README</a></p>
     </div>
   </div>
 </section>
 
-<section class="band">
-  <div class="wrap split">
-    <h2 class="eyebrow">Elsewhere</h2>
+<section class="sec">
+  <div class="wrap split-sec">
+    <h2 class="poster-h3">Elsewhere</h2>
     <div class="prose">
       <ul class="plain-list">
         <li><a href="{{ site.Params.hubUrl }}">{{ site.Params.hubName }}</a></li>
@@ -61,6 +66,6 @@
   </div>
 </section>
 {{- with .Content }}
-<section class="band"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
+<section class="sec"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
 {{- end }}
 {{ end }}
