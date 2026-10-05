@@ -80,7 +80,7 @@ make build      # production build into public/
 
 ## How it is put together
 
-Five pages: home, **About Us**, **Events**, **What we do** and **Contact**. The look is clean and modern: white paper, near-black type in Plus Jakarta Sans, soft rounded panels, pill buttons, hairline section breaks, and a circle with a small dot standing for the object on the table. No photographs. The home page is the pitch to prospective guests; its copy lives in the front matter of `content/_index.md`.
+Five pages: home, **About Us**, **Events**, **What we do** and **Contact**. The look is clean and spare: white paper, bold near-black headings in Outfit, pill buttons, hairline section breaks, one black block, and a circle with a small dot standing for the object on the table. Few sections, few words, no photographs. The home page is the pitch to prospective guests; its copy lives in the front matter of `content/_index.md`.
 
 - `hugo.toml`: site settings, the menu, contact details, the Outlook feed URL, and the custom `.ics` and `.json` output formats.
 - `layouts/`: templates. `home.html`, `about.html`, `what-we-do.html`, `contact.html`, `events/section.html` (the Events list with its series filter), `events/page.html` (one event), and the `*.calendar.ics` and `home.eventsjson.json` feed templates. Shared pieces live in `layouts/partials/`.
@@ -89,7 +89,7 @@ Five pages: home, **About Us**, **Events**, **What we do** and **Contact**. The 
 - `content/events/<series>/_index.md`: each series' description, one-line `short`, `headline`, and the `facts` shown on What we do. Series pages have no HTML of their own; they are listed on Events and What we do and keep only their `.ics` feed.
 - `assets/scss/main.scss`: all styles. Colours and type are set as variables at the top. Hugo compiles it; there is no npm.
 - `assets/js/site.js`: the Events page's series filter. The page works without it.
-- `static/fonts/`: Plus Jakarta Sans (SIL Open Font License, licence text alongside), self-hosted.
+- `static/fonts/`: Outfit (SIL Open Font License, licence text alongside), self-hosted.
 - `scripts/import_ics.py`: the Outlook import. `scripts/check_events.py`: the validator that runs on pull requests.
 - `tests/`: pytest suite for both scripts and a build smoke test.
 - `.github/workflows/deploy.yml`: builds on push, pull request and a daily schedule; deploys to GitHub Pages.

@@ -5,14 +5,13 @@
 {{- $upcoming := where $all "Date" "ge" $now -}}
 <section class="page-head">
   <div class="wrap">
-    <p class="kicker">Small Things · Speakers' Corner · HISS Hub</p>
     <h1 class="h-xl">{{ .Title }}</h1>
     <div class="lede">{{ .Content }}</div>
   </div>
 </section>
 
 {{- with $upcoming }}
-<section class="section">
+<section class="section section-line">
   <div class="wrap">
     <div class="filters" data-filters>
       <span class="filters-label">Show</span>
@@ -26,28 +25,22 @@
   </div>
 </section>
 {{- else }}
-<section class="section">
+<section class="section section-line">
   <div class="wrap">
-    <div class="panel panel-soft notice-panel">
-      <p class="notice">{{ .Params.notice | default "Coming soon… to be announced!" }}</p>
-      <p class="lede lede-center">Season one dates are being confirmed. Subscribe below and they will appear in your calendar the moment they land.</p>
-    </div>
+    <p class="notice">{{ .Params.notice | default "Coming soon… to be announced!" }}</p>
   </div>
 </section>
 {{- end }}
 
-<section class="section section-line">
-  <div class="wrap">
-    <div class="section-head"><div><p class="kicker">Subscribe</p><h2 class="h-lg">Add the calendar once</h2></div></div>
-    <div class="cards cards-4">
-      {{- with site.Home.OutputFormats.Get "calendar" }}
-      <a class="card card-link" href="{{ .Permalink }}"><p class="kicker">All</p><h3>Every event</h3><p>All three series in one .ics feed.</p></a>
-      {{- end }}
-      {{- range .Sections.ByWeight }}{{ $s := . }}{{ with .OutputFormats.Get "calendar" }}
-      <a class="card card-link" href="{{ .Permalink }}"><p class="kicker">{{ $s.Title }}</p><h3>{{ $s.Title }} only</h3><p>{{ $s.Params.short }}</p></a>
-      {{- end }}{{ end }}
+<section class="band">
+  <div class="wrap band-inner">
+    <div>
+      <p class="band-text">Subscribe once. New dates appear in your own calendar.</p>
+      <p class="inline-links"><span>One series only:</span>
+        {{- range .Sections.ByWeight }}{{ $t := .Title }}{{ with .OutputFormats.Get "calendar" }}<a href="{{ .Permalink }}">{{ $t }}</a>{{ end }}{{ end }}
+      </p>
     </div>
-    <p class="muted-note">Paste a link into Outlook or Google Calendar under "Add from URL". HISS Hub events come from the Hub's shared Outlook calendar and refresh once a day.</p>
+    {{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn" href="{{ .Permalink }}">Subscribe to all events</a>{{ end }}
   </div>
 </section>
 {{ end }}

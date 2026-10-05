@@ -3,23 +3,8 @@
 {{- $events := site.GetPage "/events" -}}
 <section class="page-head">
   <div class="wrap">
-    <p class="kicker">{{ .Params.eyebrow | default site.Title }}</p>
     <h1 class="h-xl">{{ .Title }}</h1>
     {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
-  </div>
-</section>
-
-<section class="section">
-  <div class="wrap">
-    <div class="cards cards-3">
-      {{- range $i, $s := $events.Sections.ByWeight }}
-      <a class="card card-link" href="#{{ $s.Params.series }}">
-        <p class="kicker">{{ printf "%02d" (add $i 1) }}</p>
-        <h3>{{ $s.Title }}</h3>
-        <p>{{ $s.Params.short }}</p>
-      </a>
-      {{- end }}
-    </div>
   </div>
 </section>
 
@@ -27,10 +12,8 @@
 <section class="section section-line" id="{{ $s.Params.series }}">
   <div class="wrap two-col">
     <div>
-      <p class="kicker">{{ printf "%02d" (add $i 1) }}</p>
       <h2 class="h-lg">{{ $s.Title }}</h2>
       <p class="series-head">{{ $s.Params.headline | default $s.Params.short }}</p>
-      <p class="actions"><a class="btn btn-outline" href="{{ $events.RelPermalink }}#{{ $s.Params.series }}">Upcoming events</a></p>
     </div>
     <div>
       <div class="prose">{{ $s.Content }}</div>
@@ -39,6 +22,7 @@
         {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value | markdownify }}</dd></div>{{ end }}
       </dl>
       {{- end }}
+      <p class="actions actions-tight"><a class="link-arrow" href="{{ $events.RelPermalink }}#{{ $s.Params.series }}">Upcoming events</a></p>
     </div>
   </div>
 </section>
@@ -47,20 +31,13 @@
 {{- with .Params.takePart }}
 <section class="section section-line" id="take-part">
   <div class="wrap">
-    <div class="section-head"><div><p class="kicker">Take part</p><h2 class="h-lg">Three ways in</h2></div></div>
-    <div class="cards cards-3">
+    <h2 class="h-lg">Take part</h2>
+    <div class="cols-3">
       {{- range . }}
-      <div class="card">
-        <p class="kicker">{{ .label }}</p>
-        <h3>{{ .title }}</h3>
-        <div class="prose card-prose">{{ .body | markdownify }}</div>
-      </div>
+      <div><h3>{{ .title }}</h3><p>{{ .body | markdownify }}</p></div>
       {{- end }}
     </div>
   </div>
 </section>
-{{- end }}
-{{- with .Content }}
-<section class="section section-line"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
 {{- end }}
 {{ end }}

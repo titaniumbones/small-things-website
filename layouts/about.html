@@ -2,7 +2,6 @@
 {{ define "main" }}
 <section class="page-head">
   <div class="wrap">
-    <p class="kicker">{{ .Params.eyebrow | default site.Title }}</p>
     <h1 class="h-xl">{{ .Title }}</h1>
     {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
   </div>
@@ -14,8 +13,5 @@
     <div class="prose">{{ .body | markdownify }}</div>
   </div>
 </section>
-{{- end }}
-{{- with .Content }}
-<section class="section section-line"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
 {{- end }}
 {{ end }}

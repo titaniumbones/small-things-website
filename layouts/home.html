@@ -4,39 +4,25 @@
 {{- $now := now -}}
 {{- $upcoming := where (where $all "Date" "ge" $now) "Params.status" "ne" "cancelled" -}}
 {{- $events := site.GetPage "/events" -}}
-{{- $what := site.GetPage "/what-we-do" -}}
-{{- $about := site.GetPage "/about" -}}
-{{- $st := site.GetPage "/events/small-things" -}}
-{{- $pilot := "" -}}{{- with $st }}{{ $pilot = index (where .RegularPages "Params.episode" 0) 0 }}{{ end -}}
 {{- $mail := printf "mailto:%s?subject=%s" site.Params.contactEmail (replace (urlquery "Small Things: an object") "+" "%20") -}}
 
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <p class="kicker">{{ .Params.kicker }}</p>
       <h1 class="h-xl">{{ .Params.headline | default "One object. One guest. One hour." }}</h1>
       <p class="lede">{{ .Params.lede }}</p>
-      <p class="actions"><a class="btn" href="{{ $mail }}">Propose an object</a><a class="btn btn-outline" href="{{ $events.RelPermalink }}">Come to a recording</a></p>
-      {{- with $pilot }}<p class="hero-note">Our pilot was recorded on {{ .Date.Format "2 January 2006" }}{{ with .Params.speakers }} with {{ delimit . ", " " and " }}{{ end }}. <a href="{{ .RelPermalink }}">About the pilot</a></p>{{ end }}
+      <p class="actions"><a class="btn" href="{{ $mail }}">Propose an object</a><a class="link-arrow" href="#how">How it works</a></p>
     </div>
     <div class="hero-art" aria-hidden="true"><div class="orb"><span class="orb-dot"></span></div></div>
   </div>
 </section>
 
 {{- with .Params.pitch }}
-<section class="section" id="guests">
+<section class="dark section" id="guests">
   <div class="wrap">
-    <div class="panel panel-dark panel-grid">
-      <div>
-        <p class="kicker">For faculty</p>
-        <h2 class="h-lg">{{ .heading }}</h2>
-        <div class="prose prose-lg">{{ .body | markdownify }}</div>
-        <p class="actions"><a class="btn btn-light" href="{{ $mail }}">Propose an object</a><a class="btn btn-outline-light" href="{{ $about.RelPermalink }}">Who we are</a></p>
-      </div>
-      {{- with .points }}
-      <ul class="points">{{ range . }}<li><span class="point-dot" aria-hidden="true"></span>{{ . }}</li>{{ end }}</ul>
-      {{- end }}
-    </div>
+    <h2 class="h-lg">{{ .heading }}</h2>
+    <p class="lede">{{ .body }}</p>
+    <p class="actions"><a class="btn" href="{{ $mail }}">Propose an object</a></p>
   </div>
 </section>
 {{- end }}
@@ -44,45 +30,24 @@
 {{- with .Params.steps }}
 <section class="section" id="how">
   <div class="wrap">
-    <div class="section-head"><div><p class="kicker">How it works</p><h2 class="h-lg">From object to episode</h2></div></div>
-    <ol class="cards cards-4">
+    <h2 class="h-lg">How it works</h2>
+    <ol class="steps">
       {{- range $i, $s := . }}
-      <li class="card"><span class="card-num" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span><h3>{{ $s.title }}</h3><p>{{ $s.body }}</p></li>
+      <li><span class="step-num" aria-hidden="true">{{ add $i 1 }}</span><h3>{{ $s.title }}</h3><p>{{ $s.body }}</p></li>
       {{- end }}
     </ol>
   </div>
 </section>
 {{- end }}
 
-<section class="section section-line" id="season">
-  <div class="wrap two-col">
-    <div><p class="kicker">Recordings</p><h2 class="h-lg">{{ .Params.season.heading | default "Season one" }}</h2></div>
-    <div>
-      {{- with first 3 $upcoming }}
-      <ul class="event-list">{{ range . }}{{ partial "event-row.html" . }}{{ end }}</ul>
-      {{- else }}
-      <p class="season-body">{{ $.Params.season.body }}</p>
-      {{- end }}
-      <p class="actions">{{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn" href="{{ .Permalink }}">Subscribe to the calendar</a>{{ end }}<a class="btn btn-outline" href="{{ $events.RelPermalink }}">All events</a></p>
-    </div>
-  </div>
-</section>
-
-<section class="section section-line" id="series">
-  <div class="wrap">
-    <div class="section-head">
-      <div><p class="kicker">Also from the Hub</p><h2 class="h-lg">Three series, one calendar</h2></div>
-      <a class="link-arrow" href="{{ $what.RelPermalink }}">What we do</a>
-    </div>
-    <div class="cards cards-3">
-      {{- range $i, $s := $events.Sections.ByWeight }}
-      <a class="card card-link" href="{{ $what.RelPermalink }}#{{ $s.Params.series }}">
-        <p class="kicker">{{ printf "%02d" (add $i 1) }}</p>
-        <h3>{{ $s.Title }}</h3>
-        <p>{{ $s.Params.short }}</p>
-      </a>
-      {{- end }}
-    </div>
+<section class="band" id="season">
+  <div class="wrap band-inner">
+    {{- with first 3 $upcoming }}
+    <ul class="event-list band-list">{{ range . }}{{ partial "event-row.html" . }}{{ end }}</ul>
+    {{- else }}
+    <p class="band-text">{{ $.Params.season }}</p>
+    {{- end }}
+    {{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn btn-outline" href="{{ .Permalink }}">Subscribe to the calendar</a>{{ end }}
   </div>
 </section>
 {{ end }}

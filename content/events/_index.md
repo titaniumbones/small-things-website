@@ -6,4 +6,4 @@ outputs: ["html", "calendar"]
 notice: "Coming soon… to be announced!"
 ---
 
-Three series, one list. Subscribe to any of them and new events appear in your own calendar the moment they are scheduled.
+Three series, one list.
