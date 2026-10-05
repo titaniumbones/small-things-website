@@ -64,7 +64,7 @@
     {{- else }}
     <p class="band-text"><span class="pill pill-quiet"><span class="pill-dot" aria-hidden="true"></span>{{ $.Params.season.label }}</span>{{ $.Params.season.body }}</p>
     {{- end }}
-    {{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn btn-outline" href="{{ .Permalink }}">Subscribe to the calendar</a>{{ end }}
+    {{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn btn-outline" href="{{ .RelPermalink }}">Subscribe to the calendar</a>{{ end }}
   </div>
 </section>
 {{ end }}

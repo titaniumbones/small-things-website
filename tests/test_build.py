@@ -78,3 +78,12 @@ def test_home_pitches_guests(site):
     html = (site / "index.html").read_text()
     assert "Propose an object" in html
     assert "mailto:" in html
+
+
+def test_no_escaped_feed_links(site):
+    # Hugo gives calendar feeds a webcal:// address, which Go templates blank out as "#ZgotmplZ".
+    # Feed links must use relative paths so the subscribe buttons work.
+    for rel in ["index.html", "events/index.html", "contact/index.html"]:
+        html = (site / rel).read_text()
+        assert "ZgotmplZ" not in html, rel
+        assert "calendar.ics" in html, rel

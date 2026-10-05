@@ -18,7 +18,7 @@
   <section class="section section-line">
     <div class="wrap two-col two-col-aside">
       <aside class="aside">
-        {{- with .OutputFormats.Get "calendar" }}<p><a class="btn btn-outline" href="{{ .Permalink }}">Add to my calendar</a></p>{{ end }}
+        {{- with .OutputFormats.Get "calendar" }}<p><a class="btn btn-outline" href="{{ .RelPermalink }}">Add to my calendar</a></p>{{ end }}
         {{- with .Params.link }}<p><a class="btn btn-outline" href="{{ . }}">More information</a></p>{{ end }}
         {{- if .Params.imported }}<p class="aside-note">From the HISS Hub's shared calendar. To change this event, change it there.</p>{{ end }}
         <p class="aside-note"><a href="{{ (site.GetPage "/events").RelPermalink }}">All events</a></p>

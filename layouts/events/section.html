@@ -39,10 +39,10 @@
     <div>
       <p class="band-text">Subscribe once. New dates appear in your own calendar.</p>
       <p class="inline-links"><span>One series only:</span>
-        {{- range .Sections.ByWeight }}{{ $t := .Title }}{{ with .OutputFormats.Get "calendar" }}<a href="{{ .Permalink }}">{{ $t }}</a>{{ end }}{{ end }}
+        {{- range .Sections.ByWeight }}{{ $t := .Title }}{{ with .OutputFormats.Get "calendar" }}<a href="{{ .RelPermalink }}">{{ $t }}</a>{{ end }}{{ end }}
       </p>
     </div>
-    {{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn" href="{{ .Permalink }}">Subscribe to all events</a>{{ end }}
+    {{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn" href="{{ .RelPermalink }}">Subscribe to all events</a>{{ end }}
   </div>
 </section>
 {{ end }}

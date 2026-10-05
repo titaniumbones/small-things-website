@@ -32,9 +32,9 @@
   <div class="wrap two-col">
     <h2 class="h-md">Calendar</h2>
     <div class="prose">
-      <p>{{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn btn-outline" href="{{ .Permalink }}">Subscribe to all events</a>{{ end }}</p>
+      <p>{{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn btn-outline" href="{{ .RelPermalink }}">Subscribe to all events</a>{{ end }}</p>
       <p class="inline-links"><span>One series only:</span>
-        {{- range (site.GetPage "/events").Sections.ByWeight }}{{ $t := .Title }}{{ with .OutputFormats.Get "calendar" }}<a href="{{ .Permalink }}">{{ $t }}</a>{{ end }}{{ end }}
+        {{- range (site.GetPage "/events").Sections.ByWeight }}{{ $t := .Title }}{{ with .OutputFormats.Get "calendar" }}<a href="{{ .RelPermalink }}">{{ $t }}</a>{{ end }}{{ end }}
       </p>
     </div>
   </div>

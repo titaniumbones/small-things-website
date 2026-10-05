@@ -7,7 +7,7 @@
       <li><a href="{{ .URL }}">{{ .Name }}</a></li>
       {{- end }}
       {{- with site.Home.OutputFormats.Get "calendar" }}
-      <li><a href="{{ .Permalink }}">Calendar feed (.ics)</a></li>
+      <li><a href="{{ .RelPermalink }}">Calendar feed (.ics)</a></li>
       {{- end }}
       <li><a href="mailto:{{ site.Params.contactEmail }}">Email the host</a></li>
     </ul>
