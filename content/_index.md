@@ -2,7 +2,8 @@
 title: "Small Things"
 outputs: ["html", "calendar", "eventsjson"]
 kicker: "A live-recorded podcast from the HISS Research Hub, University of Toronto Scarborough"
-lede: "One faculty guest. One object on the table. One hour to find out how much it can hold."
+headline: "One object. One guest. One hour."
+lede: "Small Things is a live-recorded podcast from the HISS Research Hub at the University of Toronto Scarborough. A faculty member brings one object to the table, and we spend an hour finding out how much it can hold."
 pitch:
   heading: "We are looking for guests."
   body: |

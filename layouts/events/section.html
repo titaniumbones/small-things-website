@@ -3,40 +3,48 @@
 {{- $all := partial "all-events.html" site -}}
 {{- $now := now -}}
 {{- $upcoming := where $all "Date" "ge" $now -}}
-<section class="mast wrap">
-  <p class="mast-kicker"><span>Small Things · Speakers' Corner · HISS Hub</span><span>{{ now.Format "2006" }}–{{ (now.AddDate 1 0 0).Format "06" }}</span></p>
-  <h1 class="mast-title mast-title-sm">{{ .Title }}</h1>
-  <div class="mast-rule"></div>
+<section class="page-head">
+  <div class="wrap">
+    <p class="kicker">Small Things · Speakers' Corner · HISS Hub</p>
+    <h1 class="h-xl">{{ .Title }}</h1>
+    <div class="lede">{{ .Content }}</div>
+  </div>
 </section>
 
 {{- with $upcoming }}
-<section class="wrap list-wrap">
-  <div class="filters" data-filters>
-    <span class="filters-label">Show</span>
-    <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">Everything</button>
-    {{- range $.Sections.ByWeight }}
-    <button type="button" class="filter" data-filter="{{ .Params.series }}" aria-pressed="false">{{ .Title }}</button>
-    {{- end }}
+<section class="section">
+  <div class="wrap">
+    <div class="filters" data-filters>
+      <span class="filters-label">Show</span>
+      <button type="button" class="filter is-active" data-filter="all" aria-pressed="true">Everything</button>
+      {{- range $.Sections.ByWeight }}
+      <button type="button" class="filter" data-filter="{{ .Params.series }}" aria-pressed="false">{{ .Title }}</button>
+      {{- end }}
+    </div>
+    <div data-event-groups>{{ partial "month-list.html" (dict "pages" .) }}</div>
+    <p class="muted-note" data-empty hidden>Nothing in this series is scheduled yet.</p>
   </div>
-  <div data-event-groups>{{ partial "month-list.html" (dict "pages" .) }}</div>
-  <p class="muted-note" data-empty hidden>Nothing in this series is scheduled yet.</p>
 </section>
 {{- else }}
-<section class="wrap notice-wrap">
-  <p class="notice">{{ .Params.notice | default "Coming soon… to be announced!" }}</p>
-  <div class="prose prose-lg">{{ .Content }}</div>
+<section class="section">
+  <div class="wrap">
+    <div class="panel panel-soft notice-panel">
+      <p class="notice">{{ .Params.notice | default "Coming soon… to be announced!" }}</p>
+      <p class="lede lede-center">Season one dates are being confirmed. Subscribe below and they will appear in your calendar the moment they land.</p>
+    </div>
+  </div>
 </section>
 {{- end }}
 
-<section class="sec">
+<section class="section section-line">
   <div class="wrap">
-    <div class="sec-head"><p class="kicker">Subscribe</p><h2 class="poster-h2">Get the dates the moment they land</h2></div>
-    <div class="cols cols-4">
+    <div class="section-head"><div><p class="kicker">Subscribe</p><h2 class="h-lg">Add the calendar once</h2></div></div>
+    <div class="cards cards-4">
       {{- with site.Home.OutputFormats.Get "calendar" }}
-      <div class="col"><p class="kicker">All</p><h3 class="col-title"><a href="{{ .Permalink }}">Every event (.ics)</a></h3><p>All three series in one feed.</p></div>
+      <a class="card card-link" href="{{ .Permalink }}"><p class="kicker">All</p><h3>Every event</h3><p>All three series in one .ics feed.</p></a>
       {{- end }}
       {{- range .Sections.ByWeight }}{{ $s := . }}{{ with .OutputFormats.Get "calendar" }}
-      <div class="col"><p class="kicker">{{ $s.Title }}</p><h3 class="col-title"><a href="{{ .Permalink }}">{{ $s.Title }} only (.ics)</a></h3><p>{{ $s.Params.short }}</p></div>
+      <a class="card card-link" href="{{ .Permalink }}"><p class="kicker">{{ $s.Title }}</p><h3>{{ $s.Title }} only</h3><p>{{ $s.Params.short }}</p></a>
       {{- end }}{{ end }}
     </div>
     <p class="muted-note">Paste a link into Outlook or Google Calendar under "Add from URL". HISS Hub events come from the Hub's shared Outlook calendar and refresh once a day.</p>

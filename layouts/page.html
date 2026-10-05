@@ -1,9 +1,10 @@
 {{ define "main" }}
-<section class="mast wrap">
-  <p class="mast-kicker"><span>{{ .Params.eyebrow | default site.Title }}</span></p>
-  <h1 class="mast-title mast-title-sm">{{ .Title }}</h1>
-  <div class="mast-rule"></div>
-  {{ with .Description }}<p class="mast-lede mast-lede-wide">{{ . }}</p>{{ end }}
+<section class="page-head">
+  <div class="wrap">
+    <p class="kicker">{{ .Params.eyebrow | default site.Title }}</p>
+    <h1 class="h-xl">{{ .Title }}</h1>
+    {{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}
+  </div>
 </section>
-<section class="sec"><div class="wrap"><div class="prose">{{ .Content }}</div></div></section>
+<section class="section section-line"><div class="wrap"><div class="prose">{{ .Content }}</div></div></section>
 {{ end }}

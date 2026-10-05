@@ -1,60 +1,59 @@
 {{ define "bodyclass" }}what-we-do{{ end }}
 {{ define "main" }}
 {{- $events := site.GetPage "/events" -}}
-<section class="mast wrap">
-  <p class="mast-kicker"><span>{{ .Params.eyebrow | default site.Title }}</span></p>
-  <h1 class="mast-title mast-title-sm">{{ .Title }}</h1>
-  <div class="mast-rule"></div>
-  {{ with .Params.lede }}<p class="mast-lede mast-lede-wide">{{ . }}</p>{{ end }}
+<section class="page-head">
+  <div class="wrap">
+    <p class="kicker">{{ .Params.eyebrow | default site.Title }}</p>
+    <h1 class="h-xl">{{ .Title }}</h1>
+    {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
+  </div>
 </section>
 
-<section class="sec">
+<section class="section">
   <div class="wrap">
-    <ol class="numbered">
+    <div class="cards cards-3">
       {{- range $i, $s := $events.Sections.ByWeight }}
-      <li>
-        <span class="num">{{ printf "%02d" (add $i 1) }}</span>
-        <h2><a href="#{{ $s.Params.series }}">{{ $s.Title }}</a></h2>
+      <a class="card card-link" href="#{{ $s.Params.series }}">
+        <p class="kicker">{{ printf "%02d" (add $i 1) }}</p>
+        <h3>{{ $s.Title }}</h3>
         <p>{{ $s.Params.short }}</p>
-        <span class="num"><a href="#{{ $s.Params.series }}">Read on</a></span>
-      </li>
+      </a>
       {{- end }}
-    </ol>
+    </div>
   </div>
 </section>
 
 {{- range $i, $s := $events.Sections.ByWeight }}
-<section class="sec{{ if eq $i 1 }} inv{{ end }}" id="{{ $s.Params.series }}">
-  <div class="wrap">
-    <div class="sec-head"><p class="kicker">{{ printf "%02d" (add $i 1) }}</p><h2 class="poster-h2">{{ $s.Title }}</h2></div>
-    <div class="split-sec">
-      <div>
-        <p class="series-head">{{ $s.Params.headline | default $s.Params.short }}</p>
-        <p class="cta-row"><a class="cta cta-outline" href="{{ $events.RelPermalink }}#{{ $s.Params.series }}">Upcoming events</a></p>
-      </div>
-      <div>
-        <div class="prose">{{ $s.Content }}</div>
-        {{- with $s.Params.facts }}
-        <dl class="facts">
-          {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value | markdownify }}</dd></div>{{ end }}
-        </dl>
-        {{- end }}
-      </div>
+<section class="section section-line" id="{{ $s.Params.series }}">
+  <div class="wrap two-col">
+    <div>
+      <p class="kicker">{{ printf "%02d" (add $i 1) }}</p>
+      <h2 class="h-lg">{{ $s.Title }}</h2>
+      <p class="series-head">{{ $s.Params.headline | default $s.Params.short }}</p>
+      <p class="actions"><a class="btn btn-outline" href="{{ $events.RelPermalink }}#{{ $s.Params.series }}">Upcoming events</a></p>
+    </div>
+    <div>
+      <div class="prose">{{ $s.Content }}</div>
+      {{- with $s.Params.facts }}
+      <dl class="facts">
+        {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value | markdownify }}</dd></div>{{ end }}
+      </dl>
+      {{- end }}
     </div>
   </div>
 </section>
 {{- end }}
 
 {{- with .Params.takePart }}
-<section class="sec" id="take-part">
+<section class="section section-line" id="take-part">
   <div class="wrap">
-    <div class="sec-head"><p class="kicker">Take part</p><h2 class="poster-h2">Three ways in</h2></div>
-    <div class="cols cols-3">
+    <div class="section-head"><div><p class="kicker">Take part</p><h2 class="h-lg">Three ways in</h2></div></div>
+    <div class="cards cards-3">
       {{- range . }}
-      <div class="col">
+      <div class="card">
         <p class="kicker">{{ .label }}</p>
-        <h3 class="col-title">{{ .title }}</h3>
-        <div class="prose">{{ .body | markdownify }}</div>
+        <h3>{{ .title }}</h3>
+        <div class="prose card-prose">{{ .body | markdownify }}</div>
       </div>
       {{- end }}
     </div>
@@ -62,6 +61,6 @@
 </section>
 {{- end }}
 {{- with .Content }}
-<section class="sec"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
+<section class="section section-line"><div class="wrap"><div class="prose">{{ . }}</div></div></section>
 {{- end }}
 {{ end }}

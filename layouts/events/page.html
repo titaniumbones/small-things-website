@@ -3,11 +3,11 @@
 {{- $status := .Params.status | default "confirmed" -}}
 {{- $isST := eq .Params.series "small-things" -}}
 <article>
-  <header class="event-hero">
+  <header class="page-head">
     <div class="wrap">
       <p class="event-kicker">{{ partial "series-chip.html" . }}{{ if eq $status "cancelled" }}<span class="flag flag-cancelled">Cancelled</span>{{ else if eq $status "tbc" }}<span class="flag">Date to be confirmed</span>{{ end }}</p>
       {{- if $isST }}<p class="event-number">{{ if eq (int (.Params.episode | default 0)) 0 }}Pilot{{ else }}Episode {{ .Params.episode }}{{ end }}</p>{{ end }}
-      <h1 class="event-title">{{ .Title }}</h1>
+      <h1 class="h-xl">{{ .Title }}</h1>
       <dl class="facts">
         <div><dt>When</dt><dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "Monday 2 January 2006" }}</time><br>{{ partial "event-when.html" . }}</dd></div>
         {{- with .Params.speakers }}{{ $sp := . }}{{ if and (gt (len $sp) 0) (ne (index $sp 0) "") }}<div><dt>{{ if gt (len $sp) 1 }}Speakers{{ else }}{{ if $isST }}Guest{{ else }}Speaker{{ end }}{{ end }}</dt><dd>{{ delimit $sp ", " " and " }}{{ with $.Params.department }}<br>{{ . }}{{ end }}</dd></div>{{ end }}{{ end }}
@@ -15,11 +15,11 @@
       </dl>
     </div>
   </header>
-  <div class="band">
-    <div class="wrap split-sec split-aside">
+  <section class="section section-line">
+    <div class="wrap two-col two-col-aside">
       <aside class="aside">
-        {{- with .OutputFormats.Get "calendar" }}<p><a class="cta cta-outline" href="{{ .Permalink }}">Add to my calendar</a></p>{{ end }}
-        {{- with .Params.link }}<p><a class="cta cta-outline" href="{{ . }}">More information</a></p>{{ end }}
+        {{- with .OutputFormats.Get "calendar" }}<p><a class="btn btn-outline" href="{{ .Permalink }}">Add to my calendar</a></p>{{ end }}
+        {{- with .Params.link }}<p><a class="btn btn-outline" href="{{ . }}">More information</a></p>{{ end }}
         {{- if .Params.imported }}<p class="aside-note">From the HISS Hub's shared calendar. To change this event, change it there.</p>{{ end }}
         <p class="aside-note"><a href="{{ (site.GetPage "/events").RelPermalink }}">All events</a></p>
       </aside>
@@ -31,6 +31,6 @@
         {{- end }}
       </div>
     </div>
-  </div>
+  </section>
 </article>
 {{ end }}
