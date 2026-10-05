@@ -6,7 +6,7 @@
   <header class="page-head">
     <div class="wrap">
       <p class="event-kicker">{{ partial "series-chip.html" . }}{{ if eq $status "cancelled" }}<span class="flag flag-cancelled">Cancelled</span>{{ else if eq $status "tbc" }}<span class="flag">Date to be confirmed</span>{{ end }}</p>
-      {{- if $isST }}<p class="event-number">{{ if eq (int (.Params.episode | default 0)) 0 }}Pilot{{ else }}Episode {{ .Params.episode }}{{ end }}</p>{{ end }}
+      {{- if $isST }}<p class="eyebrow">{{ if eq (int (.Params.episode | default 0)) 0 }}Pilot{{ else }}Episode {{ printf "%02d" (int .Params.episode) }}{{ end }}</p>{{ end }}
       <h1 class="h-xl">{{ .Title }}</h1>
       <dl class="facts">
         <div><dt>When</dt><dd><time datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}">{{ .Date.Format "Monday 2 January 2006" }}</time><br>{{ partial "event-when.html" . }}</dd></div>

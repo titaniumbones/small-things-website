@@ -1,7 +1,7 @@
 {{ define "main" }}
 <section class="page-head">
   <div class="wrap">
-    <p class="kicker">{{ .Params.eyebrow | default site.Title }}</p>
+    <p class="eyebrow">{{ site.Title }}</p>
     <h1 class="h-xl">{{ .Title }}</h1>
     {{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}
   </div>

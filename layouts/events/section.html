@@ -5,6 +5,7 @@
 {{- $upcoming := where $all "Date" "ge" $now -}}
 <section class="page-head">
   <div class="wrap">
+    <p class="eyebrow">Small Things · Speakers' Corner · HISS Hub</p>
     <h1 class="h-xl">{{ .Title }}</h1>
     <div class="lede">{{ .Content }}</div>
   </div>
@@ -27,6 +28,7 @@
 {{- else }}
 <section class="section section-line">
   <div class="wrap">
+    <p class="pill pill-quiet"><span class="pill-dot" aria-hidden="true"></span>Dates to be announced</p>
     <p class="notice">{{ .Params.notice | default "Coming soon… to be announced!" }}</p>
   </div>
 </section>

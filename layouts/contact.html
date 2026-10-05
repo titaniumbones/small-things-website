@@ -3,6 +3,7 @@
 {{- $mail := printf "mailto:%s?subject=%s" site.Params.contactEmail (replace (urlquery "Small Things") "+" "%20") -}}
 <section class="page-head">
   <div class="wrap">
+    <p class="eyebrow">Get in touch</p>
     <h1 class="h-xl">{{ .Title }}</h1>
     {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
   </div>

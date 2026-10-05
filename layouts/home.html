@@ -3,37 +3,46 @@
 {{- $all := partial "all-events.html" site -}}
 {{- $now := now -}}
 {{- $upcoming := where (where $all "Date" "ge" $now) "Params.status" "ne" "cancelled" -}}
-{{- $events := site.GetPage "/events" -}}
 {{- $mail := printf "mailto:%s?subject=%s" site.Params.contactEmail (replace (urlquery "Small Things: an object") "+" "%20") -}}
 
-<section class="hero">
+<section class="hero hero-dark">
   <div class="wrap hero-grid">
     <div>
+      {{ with .Params.badge }}<p class="pill"><span class="pill-dot" aria-hidden="true"></span>{{ . }}</p>{{ end }}
       <h1 class="h-xl">{{ .Params.headline | default "One object. One guest. One hour." }}</h1>
       <p class="lede">{{ .Params.lede }}</p>
-      <p class="actions"><a class="btn" href="{{ $mail }}">Propose an object</a><a class="link-arrow" href="#how">How it works</a></p>
+      <p class="actions"><a class="btn btn-light" href="{{ $mail }}">Propose an object</a><a class="btn btn-ghost" href="#how">How it works</a></p>
     </div>
     <div class="hero-art" aria-hidden="true"><div class="orb"><span class="orb-dot"></span></div></div>
   </div>
 </section>
 
 {{- with .Params.pitch }}
-<section class="dark section" id="guests">
-  <div class="wrap">
-    <h2 class="h-lg">{{ .heading }}</h2>
-    <p class="lede">{{ .body }}</p>
-    <p class="actions"><a class="btn" href="{{ $mail }}">Propose an object</a></p>
+<section class="section" id="guests">
+  <div class="wrap two-col">
+    <div>
+      <p class="eyebrow">For faculty</p>
+      <h2 class="h-lg">{{ .heading }}</h2>
+      <p class="lede">{{ .body }}</p>
+      <p class="actions"><a class="btn" href="{{ $mail }}">Propose an object</a></p>
+    </div>
+    {{- with .facts }}
+    <dl class="facts-card">
+      {{- range . }}<div><dt>{{ .label }}</dt><dd>{{ .value }}</dd></div>{{ end }}
+    </dl>
+    {{- end }}
   </div>
 </section>
 {{- end }}
 
 {{- with .Params.steps }}
-<section class="section" id="how">
+<section class="section section-line" id="how">
   <div class="wrap">
-    <h2 class="h-lg">How it works</h2>
-    <ol class="steps">
+    <p class="eyebrow">How it works</p>
+    <h2 class="h-lg">From object to episode</h2>
+    <ol class="cards">
       {{- range $i, $s := . }}
-      <li><span class="step-num" aria-hidden="true">{{ add $i 1 }}</span><h3>{{ $s.title }}</h3><p>{{ $s.body }}</p></li>
+      <li class="card"><span class="num" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</span><h3>{{ $s.title }}</h3><p>{{ $s.body }}</p></li>
       {{- end }}
     </ol>
   </div>
@@ -45,7 +54,7 @@
     {{- with first 3 $upcoming }}
     <ul class="event-list band-list">{{ range . }}{{ partial "event-row.html" . }}{{ end }}</ul>
     {{- else }}
-    <p class="band-text">{{ $.Params.season }}</p>
+    <p class="band-text"><span class="pill pill-quiet"><span class="pill-dot" aria-hidden="true"></span>{{ $.Params.season.label }}</span>{{ $.Params.season.body }}</p>
     {{- end }}
     {{ with site.Home.OutputFormats.Get "calendar" }}<a class="btn btn-outline" href="{{ .Permalink }}">Subscribe to the calendar</a>{{ end }}
   </div>

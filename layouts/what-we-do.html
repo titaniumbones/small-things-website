@@ -3,6 +3,7 @@
 {{- $events := site.GetPage "/events" -}}
 <section class="page-head">
   <div class="wrap">
+    <p class="eyebrow">Three series</p>
     <h1 class="h-xl">{{ .Title }}</h1>
     {{ with .Params.lede }}<p class="lede">{{ . }}</p>{{ end }}
   </div>
@@ -12,6 +13,7 @@
 <section class="section section-line" id="{{ $s.Params.series }}">
   <div class="wrap two-col">
     <div>
+      <p class="eyebrow">{{ printf "%02d" (add $i 1) }}</p>
       <h2 class="h-lg">{{ $s.Title }}</h2>
       <p class="series-head">{{ $s.Params.headline | default $s.Params.short }}</p>
     </div>
@@ -31,10 +33,11 @@
 {{- with .Params.takePart }}
 <section class="section section-line" id="take-part">
   <div class="wrap">
-    <h2 class="h-lg">Take part</h2>
-    <div class="cols-3">
+    <p class="eyebrow">Take part</p>
+    <h2 class="h-lg">Three ways in</h2>
+    <div class="cards">
       {{- range . }}
-      <div><h3>{{ .title }}</h3><p>{{ .body | markdownify }}</p></div>
+      <div class="card"><span class="num">{{ .label }}</span><h3>{{ .title }}</h3><p>{{ .body | markdownify }}</p></div>
       {{- end }}
     </div>
   </div>

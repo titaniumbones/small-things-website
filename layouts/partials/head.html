@@ -15,7 +15,7 @@
 {{- range .AlternativeOutputFormats }}
 <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink | safeURL }}" title="{{ $.Title }}">
 {{- end }}
-{{- $latin := "fonts/Outfit-latin.woff2" | relURL }}
+{{- $latin := "fonts/SpaceGrotesk-latin.woff2" | relURL }}
 <link rel="preload" href="{{ $latin }}" as="font" type="font/woff2" crossorigin>
 {{- $scss := resources.Get "scss/main.scss" | css.Sass (dict "outputStyle" "compressed") | fingerprint }}
 <link rel="stylesheet" href="{{ $scss.RelPermalink }}" integrity="{{ $scss.Data.Integrity }}">
