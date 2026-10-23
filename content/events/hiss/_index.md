@@ -2,6 +2,7 @@
 title: "HISS Hub"
 short: "Talks, screenings, launches and Conversations from the HISS Research Hub and its six departments."
 weight: 20
+outputs: ["calendar"]
 cascade:
   params:
     series: "hiss"

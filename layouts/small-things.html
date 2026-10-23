@@ -1,0 +1,32 @@
+{{ define "bodyclass" }}small-things{{ end }}
+{{ define "main" }}
+{{- $parts := partial "content-parts.html" .Content -}}
+{{- $episodes := (where (partial "all-events.html" site) "Params.series" "small-things").ByDate.Reverse -}}
+<section class="hero hero-dark">
+  <div class="wrap">
+    {{ with .Params.badge }}<p class="pill"><span class="pill-dot" aria-hidden="true"></span>{{ . }}</p>{{ end }}
+    <h1 class="h-xl">{{ .Title }}</h1>
+    {{ with $parts.intro }}<div class="lede">{{ . }}</div>{{ end }}
+  </div>
+</section>
+{{- range $parts.sections }}
+<section class="section section-line">
+  <div class="wrap two-col">
+    {{ .heading }}
+    <div class="prose">
+      {{ .body }}
+      {{- /* The "## Episodes" section also lists every Small Things event from the Outlook calendar. */}}
+      {{- if strings.Contains (string .heading) `id="episodes"` }}
+      {{- with $episodes }}
+      <ul class="episode-list">
+        {{- range . }}
+        <li><a href="{{ .RelPermalink }}">{{ replaceRE `(?i)^\s*small\s+things\s*:\s*` "" .Title }}</a> <span class="row-meta">{{ .Date.Format "2 January 2006" }}</span></li>
+        {{- end }}
+      </ul>
+      {{- end }}
+      {{- end }}
+    </div>
+  </div>
+</section>
+{{- end }}
+{{ end }}

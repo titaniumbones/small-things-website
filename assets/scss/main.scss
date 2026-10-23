@@ -262,3 +262,7 @@ p { margin: 0 0 1em; }
 
 // TODO placeholders ({{< todo >}}): visible in previews and `hugo server`, absent from the live site.
 .todo { background: #fde68a; color: #422006; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.85em; padding: 0.1em 0.35em; border-radius: 3px; }
+
+// Shown where upcoming events would be when the Outlook calendar has none.
+.empty-state { font-size: clamp(1.25rem, 2.2vw, 1.75rem); font-weight: 600; letter-spacing: -0.02em; margin: 0; max-width: 32ch; a { color: inherit; } }
+.hero-dark ~ .band .empty-state a, .empty-state a { text-decoration-thickness: 2px; text-underline-offset: 0.2em; }

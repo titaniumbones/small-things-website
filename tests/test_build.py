@@ -123,3 +123,41 @@ def test_page_sections_render_from_markdown(site):
     html = (site / "about" / "index.html").read_text()
     assert html.count('class="section section-line"') >= 3
     assert re.search(r'<h2[^>]*class="?h-md', html)
+
+
+TOMORROW = datetime.now() + timedelta(days=1)
+
+
+def test_empty_state_when_no_upcoming(site):
+    for rel in ["index.html", "events/index.html"]:
+        assert "Nothing is on the calendar yet" in (site / rel).read_text(), rel
+
+
+def test_past_events_still_listed(site):
+    assert "Past Hub Event" in (site / "events" / "index.html").read_text()
+
+
+def test_upcoming_event_listed(tmp_path):
+    out = build(tmp_path, events=(PAST_HUB, event("hiss", "Tomorrow Talk", TOMORROW)))
+    for rel in ["index.html", "events/index.html"]:
+        html = (out / rel).read_text()
+        assert "Tomorrow Talk" in html, rel
+        assert "Nothing is on the calendar yet" not in html, rel
+
+
+def test_propose_link(site):
+    assert "mailto:matt.price@utoronto.ca?subject=Event%20proposal" in (site / "index.html").read_text()
+    assert "Propose an event" in (site / "events" / "index.html").read_text()
+
+
+def test_small_things_lists_episode(site):
+    html = (site / "small-things" / "index.html").read_text()
+    assert "Bhavani Raman" in html
+    assert "Small Things: Bhavani" not in html
+
+
+def test_departments_page_has_six_sections(site):
+    html = (site / "departments" / "index.html").read_text()
+    for name in ["Anthropology", "Arts, Culture and Media", "English", "Human Geography", "Historical and Cultural Studies", "Language Studies"]:
+        assert name in html, name
+    assert html.count('class="section section-line"') == 6
