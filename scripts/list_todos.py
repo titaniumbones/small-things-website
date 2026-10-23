@@ -40,8 +40,16 @@ def find_todos(paths: list[Path]) -> list[tuple[Path, int, str]]:
     """Every placeholder in the given files, as (path, line number, text)."""
     found = []
     for path in files_under(paths):
+        in_code = False
         for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
-            hits = [m.group(1).strip() for m in SHORTCODE.finditer(line)] if path.suffix == ".md" else []
+            # Examples inside fenced code blocks (as in the README) are not placeholders.
+            if path.suffix == ".md" and line.lstrip().startswith("```"):
+                in_code = not in_code
+                continue
+            if in_code:
+                continue
+            prose = re.sub(r"`[^`]*`", "", line)  # inline code is an example, not a placeholder
+            hits = [m.group(1).strip() for m in SHORTCODE.finditer(prose)] if path.suffix == ".md" else []
             if not hits and (m := PLAIN.search(line)):
                 hits = [m.group(0).strip()]
             found.extend((path, n, h) for h in hits)
