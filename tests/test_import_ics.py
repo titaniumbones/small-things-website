@@ -2,6 +2,8 @@ from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import pytest
+
 import import_ics as m
 
 FIX = Path(__file__).parent / "fixtures" / "sample.ics"
@@ -50,14 +52,33 @@ def test_occurrences_respect_window():
     assert {e["title"] for e in evs} == {"Centre for Ethnography Speakers Series"}
 
 
-def test_write_events_skips_repo_titles_and_dedups_filenames(tmp_path):
+def test_series_for_title():
+    for t in ["Small Things: Bhavani Raman & Matt Price", "small things:x", "  Small  Things :  x"]:
+        assert m.series_for_title(t) == "small-things", t
+    for t in ["Small Things - x", "A talk on small things: y", "Lunch with Leanne"]:
+        assert m.series_for_title(t) == "hiss", t
+
+
+def _dirs(tmp_path):
+    return {"hiss": tmp_path / "hiss", "small-things": tmp_path / "small-things"}
+
+
+def test_write_events_routes_by_series(tmp_path):
+    dirs = _dirs(tmp_path)
+    for d in dirs.values():
+        d.mkdir()
+        (d / "_index.md").write_text("---\ntitle: x\n---\n")
+        (d / "stale.md").write_text("---\ntitle: old\n---\n")
     evs = m.occurrences(FIX.read_bytes(), date(2026, 1, 1), date(2026, 12, 31))
-    skip = {m.normalise_title("Small Things: Bhavani Raman and Matt Price")}
-    written = m.write_events(evs, out_dir=tmp_path, skip_titles=skip)
-    names = sorted(p.name for p in written)
-    assert not any("small-things" in n for n in names)
-    assert len(names) == len(set(names)) == 5
-    text = (tmp_path / next(n for n in names if "book-launch" in n)).read_text()
+    written = m.write_events(evs, out_dirs=dirs)
+    small = sorted(p.name for p in written if p.parent == dirs["small-things"])
+    hiss = sorted(p.name for p in written if p.parent == dirs["hiss"])
+    assert len(small) == 1 and "bhavani-raman" in small[0]
+    assert len(hiss) == len(set(hiss)) == 5
+    for d in dirs.values():
+        assert (d / "_index.md").exists()
+        assert not (d / "stale.md").exists()
+    text = (dirs["hiss"] / next(n for n in hiss if "book-launch" in n)).read_text()
     assert "title: Book Launch, Donna Young" in text
     assert "imported: true" in text
     assert "link: https://example.org/launch" in text
@@ -65,17 +86,23 @@ def test_write_events_skips_repo_titles_and_dedups_filenames(tmp_path):
     assert "date: '2026-04-01T13:00:00-04:00'" in text
 
 
+def test_empty_feed_writes_nothing_and_succeeds(tmp_path):
+    empty = b"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//x//EN\r\nEND:VCALENDAR\r\n"
+    evs = m.occurrences(empty, date(2026, 1, 1), date(2026, 12, 31))
+    assert m.write_events(evs, out_dirs=_dirs(tmp_path)) == []
+
+
+def test_main_fails_on_bad_feed(tmp_path):
+    bad = tmp_path / "bad.ics"
+    bad.write_text("<html>not a calendar</html>")
+    with pytest.raises(SystemExit) as exc:
+        m.main(["--from", str(bad)])
+    assert exc.value.code not in (0, None)
+
+
 def test_write_events_replaces_previous_output(tmp_path):
     (tmp_path / "stale.md").write_text("---\ntitle: old\n---\n")
     (tmp_path / "_index.md").write_text("---\ntitle: HISS Hub\n---\n")
-    m.write_events([], out_dir=tmp_path)
+    m.write_events([], out_dirs={"hiss": tmp_path})
     assert not (tmp_path / "stale.md").exists()
     assert (tmp_path / "_index.md").exists()
-
-
-def test_repo_event_titles_reads_front_matter(tmp_path):
-    d = tmp_path / "small-things"
-    d.mkdir()
-    (d / "_index.md").write_text("---\ntitle: Small Things\n---\n")
-    (d / "x.md").write_text("---\ntitle: 'Ep 1: The Cup'\ndate: 2026-10-15T13:00:00-04:00\n---\n\nbody\n")
-    assert m.repo_event_titles([d]) == {"ep 1 the cup"}

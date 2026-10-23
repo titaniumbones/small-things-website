@@ -24,7 +24,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 EVENTS_DIR = ROOT / "content" / "events"
-KNOWN_SERIES = {"small-things", "speakers-corner", "hiss"}
+KNOWN_SERIES = {"small-things", "hiss"}
 KNOWN_STATUS = {"confirmed", "tbc", "cancelled"}
 URL_RE = re.compile(r"^https?://\S+$")
 

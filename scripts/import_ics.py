@@ -3,14 +3,16 @@
 # requires-python = ">=3.11"
 # dependencies = ["icalendar>=6", "recurring-ical-events>=3", "pyyaml", "requests"]
 # ///
-"""Import HISS Hub events from the Hub's Outlook ICS feed into Hugo content files.
+"""Import every event from the Hub's Outlook ICS feed into Hugo content files.
 
 Reads the feed URL from hugo.toml (params.outlookFeed), expands recurring events
-within a date window, and writes one Markdown file per occurrence into
-content/events/hiss/. The folder is regenerated on every run and is gitignored.
+within a date window, and writes one Markdown file per occurrence. Outlook is the
+only source of events: an event whose title starts with "Small Things:" goes to
+content/events/small-things/, everything else to content/events/hiss/. Both folders
+are regenerated on every run and are gitignored (except their _index.md).
 
-Events whose title matches an event that already lives in the repo (Small Things,
-Speakers' Corner) are skipped, so the same event never appears twice.
+A feed that cannot be fetched or is not an iCalendar file stops the import with a
+non-zero exit, so the build fails and the last good deploy stays up.
 
 Usage:
     uv run scripts/import_ics.py                 # fetch the feed and write files
@@ -33,8 +35,9 @@ import yaml
 
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "hugo.toml"
-OUT_DIR = ROOT / "content" / "events" / "hiss"
-REPO_EVENT_DIRS = [ROOT / "content" / "events" / "small-things", ROOT / "content" / "events" / "speakers-corner"]
+EVENTS_DIR = ROOT / "content" / "events"
+OUT_DIRS = {"hiss": EVENTS_DIR / "hiss", "small-things": EVENTS_DIR / "small-things"}
+SMALL_THINGS_PREFIX = re.compile(r"^\s*small\s+things\s*:", re.I)
 TORONTO = ZoneInfo("America/Toronto")
 
 # Outlook writes Windows timezone names. Map the ones we expect to IANA zones;
@@ -98,26 +101,9 @@ def read_feed_url(config: Path = CONFIG) -> str:
     return url
 
 
-def repo_event_titles(dirs=REPO_EVENT_DIRS) -> set[str]:
-    """Normalised titles of every hand-written event in the repo."""
-    titles: set[str] = set()
-    for d in dirs:
-        if not d.exists():
-            continue
-        for path in d.glob("*.md"):
-            if path.name == "_index.md":
-                continue
-            fm = parse_front_matter(path.read_text(encoding="utf-8"))
-            if fm and fm.get("title"):
-                titles.add(normalise_title(str(fm["title"])))
-    return titles
-
-
-def parse_front_matter(text: str) -> dict | None:
-    m = re.match(r"^---\s*\n(.*?)\n---\s*\n", text, re.S)
-    if not m:
-        return None
-    return yaml.safe_load(m.group(1)) or {}
+def series_for_title(title: str) -> str:
+    """Small Things episodes are the events whose title starts with "Small Things:"."""
+    return "small-things" if SMALL_THINGS_PREFIX.match(title or "") else "hiss"
 
 
 def occurrences(ics_bytes: bytes, start: date, end: date) -> list[dict]:
@@ -125,7 +111,10 @@ def occurrences(ics_bytes: bytes, start: date, end: date) -> list[dict]:
     import icalendar
     import recurring_ical_events
 
-    cal = icalendar.Calendar.from_ical(ics_bytes)
+    try:
+        cal = icalendar.Calendar.from_ical(ics_bytes)
+    except ValueError as exc:
+        raise SystemExit(f"the Outlook feed is not an iCalendar file ({exc}); not importing") from exc
     out = []
     for ev in recurring_ical_events.of(cal, skip_bad_series=True).between(start, end):
         dtstart = ev.get("DTSTART")
@@ -186,26 +175,26 @@ def filename_for(ev: dict) -> str:
     return f"{ev['start'].strftime('%Y-%m-%d')}-{slugify(ev['title'])}.md"
 
 
-def write_events(events: list[dict], out_dir: Path = OUT_DIR, skip_titles: set[str] | None = None, dry_run: bool = False) -> list[Path]:
-    skip_titles = skip_titles or set()
-    out_dir.mkdir(parents=True, exist_ok=True)
-    if not dry_run:
-        for old in out_dir.glob("*.md"):
-            if old.name != "_index.md":
-                old.unlink()
+def write_events(events: list[dict], out_dirs: dict[str, Path] = OUT_DIRS, dry_run: bool = False) -> list[Path]:
+    """Clear each series folder (keeping _index.md) and write one file per event into its series folder."""
+    for d in out_dirs.values():
+        d.mkdir(parents=True, exist_ok=True)
+        if not dry_run:
+            for old in d.glob("*.md"):
+                if old.name != "_index.md":
+                    old.unlink()
     written: list[Path] = []
-    seen: set[str] = set()
+    seen: set[Path] = set()
     for ev in events:
-        if normalise_title(ev["title"]) in skip_titles:
-            continue
+        out_dir = out_dirs[series_for_title(ev["title"])]
         name = filename_for(ev)
         stem, n = name[:-3], 2
-        while name in seen:
+        while out_dir / name in seen:
             name, n = f"{stem}-{n}.md", n + 1
-        seen.add(name)
         path = out_dir / name
+        seen.add(path)
         if dry_run:
-            print(f"would write {path.relative_to(ROOT)}: {ev['title']} ({ev['start']:%Y-%m-%d %H:%M})")
+            print(f"would write {path.relative_to(ROOT) if path.is_relative_to(ROOT) else path}: {ev['title']} ({ev['start']:%Y-%m-%d %H:%M})")
         else:
             path.write_text(render_markdown(ev), encoding="utf-8")
         written.append(path)
@@ -232,8 +221,8 @@ def main(argv: list[str] | None = None) -> int:
 
     today = datetime.now(TORONTO).date()
     events = occurrences(ics, today - timedelta(days=args.past_days), today + timedelta(days=args.future_days))
-    written = write_events(events, skip_titles=repo_event_titles(), dry_run=args.dry_run)
-    print(f"{'would write' if args.dry_run else 'wrote'} {len(written)} event file(s) to {OUT_DIR.relative_to(ROOT)} from {len(events)} occurrence(s)")
+    written = write_events(events, dry_run=args.dry_run)
+    print(f"{'would write' if args.dry_run else 'wrote'} {len(written)} event file(s) from {len(events)} occurrence(s)")
     return 0
 
 

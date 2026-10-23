@@ -1,4 +1,5 @@
 # Netlify build for the site. Runs the same checks as the GitHub Pages workflow (.github/workflows/deploy.yml).
+# A failed Outlook import fails the build, so the last good deploy stays up.
 # Netlify sets $URL (the production address) and $DEPLOY_PRIME_URL (the address of this particular deploy).
 
 [build]
@@ -6,7 +7,7 @@
   command = """
     python3 -m pip install --quiet uv &&
     uv run scripts/check_events.py &&
-    (uv run scripts/import_ics.py || echo 'Outlook import failed; building without HISS Hub events') &&
+    uv run scripts/import_ics.py &&
     uv run --group dev pytest -q &&
     hugo --gc --minify --baseURL "$URL/"
   """
@@ -19,18 +20,20 @@
   command = """
     python3 -m pip install --quiet uv &&
     uv run scripts/check_events.py &&
-    (uv run scripts/import_ics.py || echo 'Outlook import failed; building without HISS Hub events') &&
+    uv run scripts/import_ics.py &&
     uv run --group dev pytest -q &&
     hugo --gc --minify --baseURL "$DEPLOY_PRIME_URL/"
   """
   [context.deploy-preview.environment]
     HUGO_PARAMS_NOINDEX = "true"
+    # Show {{< todo >}} placeholders on previews; production builds hide them.
+    HUGO_PARAMS_SHOWTODOS = "true"
 
 [context.branch-deploy]
   command = """
     python3 -m pip install --quiet uv &&
     uv run scripts/check_events.py &&
-    (uv run scripts/import_ics.py || echo 'Outlook import failed; building without HISS Hub events') &&
+    uv run scripts/import_ics.py &&
     hugo --gc --minify --baseURL "$DEPLOY_PRIME_URL/"
   """
   [context.branch-deploy.environment]
