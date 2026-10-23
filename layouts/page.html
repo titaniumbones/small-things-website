@@ -1,4 +1,11 @@
 {{ define "main" }}
-<section class="page-head"><div class="section-inner"><h1>{{ .Title }}</h1>{{ with .Description }}<p class="lede">{{ . }}</p>{{ end }}</div></section>
-<section class="section"><div class="section-inner"><div class="prose prose-narrow">{{ .Content }}</div></div></section>
+{{- $parts := partial "content-parts.html" .Content -}}
+<section class="page-head">
+  <div class="wrap">
+    <p class="eyebrow">{{ site.Title }}</p>
+    <h1 class="h-xl">{{ .Title }}</h1>
+    {{ with $parts.intro }}<div class="lede">{{ . }}</div>{{ end }}
+  </div>
+</section>
+{{ partial "sections.html" $parts }}
 {{ end }}

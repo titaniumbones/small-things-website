@@ -106,3 +106,20 @@ def test_links_respect_subpath(tmp_path):
     for f in [out / "index.html", out / "about" / "index.html", out / "events" / "index.html"]:
         for url in re.findall(r'(?:href|src)="?(/[^"\s>]*)', f.read_text()):
             assert url.startswith("/sub/"), f"{f.relative_to(out)}: {url}"
+
+
+def test_todos_hidden_in_production(site):
+    for f in html_files(site):
+        text = f.read_text()
+        assert 'class="todo"' not in text and "TODO" not in text, f
+
+
+def test_todos_shown_on_previews(tmp_path):
+    out = build(tmp_path, env={"HUGO_PARAMS_SHOWTODOS": "true"})
+    assert 'class="todo"' in (out / "about" / "index.html").read_text()
+
+
+def test_page_sections_render_from_markdown(site):
+    html = (site / "about" / "index.html").read_text()
+    assert html.count('class="section section-line"') >= 3
+    assert re.search(r'<h2[^>]*class="?h-md', html)

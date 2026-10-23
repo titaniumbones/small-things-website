@@ -1,0 +1,9 @@
+{{- /* Renders each ## section of a page's Markdown in Kira's two-column layout. Call as: partial "sections.html" (partial "content-parts.html" .Content) */ -}}
+{{- range .sections }}
+<section class="section section-line">
+  <div class="wrap two-col">
+    {{ .heading }}
+    <div class="prose">{{ .body }}</div>
+  </div>
+</section>
+{{- end }}

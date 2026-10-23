@@ -259,3 +259,6 @@ p { margin: 0 0 1em; }
 @media (prefers-reduced-motion: no-preference) {
   .btn, .filter, .mark, .nav a, .card { transition: background-color 140ms, color 140ms, border-color 140ms; }
 }
+
+// TODO placeholders ({{< todo >}}): visible in previews and `hugo server`, absent from the live site.
+.todo { background: #fde68a; color: #422006; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 0.85em; padding: 0.1em 0.35em; border-radius: 3px; }
