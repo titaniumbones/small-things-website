@@ -1,21 +1,24 @@
 baseURL = "https://titaniumbones.github.io/small-things-website/"
 languageCode = "en-ca"
-title = "Small Things"
+title = "HISS Research Hub"
 timeZone = "America/Toronto"
 enableRobotsTXT = true
 buildFuture = true
 disableKinds = ["taxonomy", "term"]
 
 [params]
-  description = "A live-recorded podcast from the HISS Research Hub at the University of Toronto Scarborough. One faculty guest, one object, one conversation."
+  description = "The Humanities and Interpretive Social Sciences Research Hub brings together six departments at the University of Toronto Scarborough."
   contactEmail = "matt.price@utoronto.ca"
-  hubName = "HISS Research Hub"
-  hubUrl = "https://hiss.utsc.utoronto.ca"
-  hcsUrl = "https://www.utsc.utoronto.ca/hcs/"
+  # Address of the "Propose an event" form. Empty: the link emails contactEmail instead.
+  # TODO (Matt): set this once a Microsoft Form exists, and decide who owns it.
+  proposeEventUrl = ""
   utscUrl = "https://www.utsc.utoronto.ca"
-  # Outlook ICS feed for HISS Hub events. Read by scripts/import_ics.py.
+  campusAddress = "1265 Military Trail, Toronto, ON M1C 1A4"
+  # Outlook ICS feed for every event on the site. Read by scripts/import_ics.py.
   outlookFeed = "https://outlook.office365.com/owa/calendar/440eb03d2eb1441f8a1eb982ca0bfe85@utoronto.ca/09ed34891be24022a7a03e4f01f021ba18325636079788834604/calendar.ics"
-  upcomingOnHome = 5
+  upcomingOnHome = 3
+  # Show {{< todo >}} placeholders. Off for the live site; Netlify previews and `hugo server` show them.
+  showTodos = false
 
 [outputFormats.calendar]
   mediaType = "text/calendar"
@@ -41,22 +44,23 @@ disableKinds = ["taxonomy", "term"]
 
 [menus]
   [[menus.main]]
-    name = "Small Things"
-    pageRef = "/events/small-things"
-    weight = 10
-  [[menus.main]]
-    name = "Calendar"
-    pageRef = "/calendar"
-    weight = 20
-  [[menus.main]]
-    name = "Speakers' Corner"
-    pageRef = "/events/speakers-corner"
-    weight = 30
-  [[menus.main]]
-    name = "HISS Hub"
-    pageRef = "/events/hiss"
-    weight = 40
-  [[menus.main]]
     name = "About"
     pageRef = "/about"
+    weight = 10
+  [[menus.main]]
+    name = "Departments"
+    pageRef = "/departments"
+    weight = 20
+  [[menus.main]]
+    name = "Calendar"
+    pageRef = "/events"
+    weight = 30
+  [[menus.main]]
+    name = "Small Things"
+    pageRef = "/small-things"
+    weight = 40
+  [[menus.main]]
+    identifier = "contact"
+    name = "Contact"
+    pageRef = "/contact"
     weight = 50

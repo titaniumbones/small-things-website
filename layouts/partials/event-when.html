@@ -1,8 +1,9 @@
-{{- /* Expects an event page. Time range and location, one line. */ -}}
+{{- /* Expects an event page. Time range and location, one line. The start drops its am/pm only when the end shares it. */ -}}
 {{- $start := .Date -}}
 {{- $end := "" -}}{{- with .Params.end }}{{ $end = time.AsTime . }}{{ end -}}
+{{- $sameHalf := false -}}{{- with $end }}{{ $sameHalf = eq ($start.Format "pm") (.Format "pm") }}{{ end -}}
 <span class="when">
-  <time datetime="{{ $start.Format "2006-01-02T15:04:05Z07:00" }}">{{ $start.Format "3:04" }}{{ if not $end }}{{ $start.Format " pm" | lower }}{{ end }}</time>
-  {{- with $end }}<span aria-hidden="true">–</span><span class="sr-only"> to </span><time datetime="{{ .Format "2006-01-02T15:04:05Z07:00" }}">{{ .Format "3:04 pm" | lower }}</time>{{ end -}}
+  <time datetime="{{ $start.Format "2006-01-02T15:04:05Z07:00" }}">{{ $start.Format "3:04" }}{{ if not $sameHalf }}{{ $start.Format " pm" }}{{ end }}</time>
+  {{- with $end }}<span aria-hidden="true">–</span><span class="sr-only"> to </span><time datetime="{{ .Format "2006-01-02T15:04:05Z07:00" }}">{{ .Format "3:04 pm" }}</time>{{ end -}}
   {{- with .Params.location }}<span class="where">{{ . }}</span>{{ end -}}
 </span>
