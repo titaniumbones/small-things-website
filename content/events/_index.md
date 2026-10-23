@@ -1,7 +1,7 @@
 ---
 title: "Calendar"
 description: "Every event from the HISS Research Hub and its six departments, from the Hub's Outlook calendar."
-aliases: ["/calendar/"]
+aliases: ["/calendar/", "/events/hiss/"]
 outputs: ["html", "calendar"]
 ---
 

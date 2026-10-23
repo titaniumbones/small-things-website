@@ -2,6 +2,8 @@
 title: "Small Things"
 description: "The HISS Research Hub's live-recorded podcast: one faculty guest, one object, one conversation."
 layout: "small-things"
+aliases: ["/events/small-things/"]
+outputs: ["html"]
 badge: "Looking for 2026–2027 guests"
 ---
 

@@ -1,6 +1,7 @@
 ---
 title: "Contact"
 description: "Who to write to at the HISS Research Hub, and for what."
+outputs: ["html"]
 ---
 
 Write to the Hub about events, clusters, *Small Things* or anything else on this site.

@@ -266,3 +266,6 @@ p { margin: 0 0 1em; }
 // Shown where upcoming events would be when the Outlook calendar has none.
 .empty-state { font-size: clamp(1.25rem, 2.2vw, 1.75rem); font-weight: 600; letter-spacing: -0.02em; margin: 0; max-width: 32ch; a { color: inherit; } }
 .hero-dark ~ .band .empty-state a, .empty-state a { text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+
+// The calendar filter hides rows with the hidden attribute; .event-row's display:grid would otherwise override it.
+[hidden] { display: none !important; }

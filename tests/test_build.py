@@ -161,3 +161,35 @@ def test_departments_page_has_six_sections(site):
     for name in ["Anthropology", "Arts, Culture and Media", "English", "Human Geography", "Historical and Cultural Studies", "Language Studies"]:
         assert name in html, name
     assert html.count('class="section section-line"') == 6
+
+
+def alias_target(out: Path, rel: str) -> str:
+    m = re.search(r'http-equiv="?refresh"? content="?0; url=([^"\s>]+)', (out / rel).read_text())
+    assert m, f"{rel} is not an alias redirect"
+    return m.group(1)
+
+
+def test_old_urls_redirect(site):
+    assert alias_target(site, "calendar/index.html").endswith("/events/")
+    assert alias_target(site, "what-we-do/index.html").endswith("/about/")
+    assert alias_target(site, "events/small-things/index.html").endswith("/small-things/")
+    assert alias_target(site, "events/hiss/index.html").endswith("/events/")
+    assert alias_target(site, "events/speakers-corner/index.html").endswith("/about/")
+
+
+def test_content_pages_publish_no_calendar(site):
+    for rel in ["about", "departments", "contact", "small-things"]:
+        assert not (site / rel / "calendar.ics").exists(), rel
+        assert "text/calendar" not in (site / rel / "index.html").read_text(), rel
+
+
+def test_hidden_rows_are_hidden_by_css(site):
+    css = next((site / "scss").glob("main*.css")).read_text()
+    assert re.search(r"\[hidden\]\s*\{\s*display:\s*none\s*!important", css)
+
+
+def test_site_feed_is_named_for_the_hub(site):
+    raw = (site / "calendar.ics").read_text()
+    assert "X-WR-CALNAME:HISS Research Hub" in raw
+    assert "Small Things, HISS Hub and Speakers" not in raw
+    assert "PRODID:-//HISS Research Hub//" in raw

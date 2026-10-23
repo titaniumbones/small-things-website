@@ -106,8 +106,12 @@ def series_for_title(title: str) -> str:
     return "small-things" if SMALL_THINGS_PREFIX.match(title or "") else "hiss"
 
 
-def occurrences(ics_bytes: bytes, start: date, end: date) -> list[dict]:
-    """Expand the calendar into concrete occurrences between start and end."""
+def occurrences(ics_bytes: bytes, start: date, end: date, keep_series: set[str] = frozenset()) -> list[dict]:
+    """Expand the calendar into concrete occurrences between start and end.
+
+    Events in a series named in keep_series are kept however long ago they were
+    (Small Things episodes stay on the site for good); end still applies.
+    """
     import icalendar
     import recurring_ical_events
 
@@ -116,7 +120,8 @@ def occurrences(ics_bytes: bytes, start: date, end: date) -> list[dict]:
     except ValueError as exc:
         raise SystemExit(f"the Outlook feed is not an iCalendar file ({exc}); not importing") from exc
     out = []
-    for ev in recurring_ical_events.of(cal, skip_bad_series=True).between(start, end):
+    earliest = date(1970, 1, 1) if keep_series else start
+    for ev in recurring_ical_events.of(cal, skip_bad_series=True).between(earliest, end):
         dtstart = ev.get("DTSTART")
         if dtstart is None:
             continue
@@ -124,12 +129,15 @@ def occurrences(ics_bytes: bytes, start: date, end: date) -> list[dict]:
         begin = to_toronto(dtstart.dt, tzid)
         dtend = ev.get("DTEND")
         finish = to_toronto(dtend.dt, dtend.params.get("TZID") if hasattr(dtend, "params") else None) if dtend is not None else None
+        title = str(ev.get("SUMMARY", "Untitled event")).strip()
+        if begin.date() < start and series_for_title(title) not in keep_series:
+            continue
         all_day = not isinstance(dtstart.dt, datetime)
         status = str(ev.get("STATUS", "CONFIRMED")).upper()
         out.append(
             {
                 "uid": str(ev.get("UID", "")),
-                "title": str(ev.get("SUMMARY", "Untitled event")).strip(),
+                "title": title,
                 "start": begin,
                 "end": finish,
                 "all_day": all_day,
@@ -204,7 +212,7 @@ def write_events(events: list[dict], out_dirs: dict[str, Path] = OUT_DIRS, dry_r
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--from", dest="source", help="local .ics file instead of the live feed")
-    ap.add_argument("--past-days", type=int, default=400, help="keep events this many days back (default 400)")
+    ap.add_argument("--past-days", type=int, default=400, help="keep Hub events this many days back (default 400); Small Things episodes are always kept")
     ap.add_argument("--future-days", type=int, default=400, help="keep events this many days ahead (default 400)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args(argv)
@@ -219,8 +227,12 @@ def main(argv: list[str] | None = None) -> int:
         resp.raise_for_status()
         ics = resp.content
 
+    # A published calendar with no events at all means something is wrong upstream (unpublished,
+    # emptied, wrong URL): stop rather than wipe the site. Zero events in the date window is fine.
+    if b"BEGIN:VEVENT" not in ics:
+        raise SystemExit("the Outlook feed has no events at all; not importing (is the calendar still published?)")
     today = datetime.now(TORONTO).date()
-    events = occurrences(ics, today - timedelta(days=args.past_days), today + timedelta(days=args.future_days))
+    events = occurrences(ics, today - timedelta(days=args.past_days), today + timedelta(days=args.future_days), keep_series={"small-things"})
     written = write_events(events, dry_run=args.dry_run)
     print(f"{'would write' if args.dry_run else 'wrote'} {len(written)} event file(s) from {len(events)} occurrence(s)")
     return 0

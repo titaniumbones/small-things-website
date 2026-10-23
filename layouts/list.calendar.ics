@@ -1,4 +1,4 @@
 {{- $events := "" -}}
 {{- if .IsHome }}{{ $events = partial "all-events.html" site }}{{ else }}{{ $events = .RegularPagesRecursive.ByDate }}{{ end -}}
-{{- $name := cond .IsHome "Small Things, HISS Hub and Speakers' Corner events at UTSC" (printf "%s (UTSC)" .Title) -}}
+{{- $name := cond .IsHome site.Title (printf "%s: %s" site.Title .Title) -}}
 {{- partial "ics-calendar.html" (dict "name" $name "events" $events) -}}

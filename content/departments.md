@@ -1,6 +1,7 @@
 ---
 title: "Departments"
 description: "The six UTSC departments that founded the HISS Research Hub."
+outputs: ["html"]
 ---
 
 Six departments at the University of Toronto Scarborough founded the Hub. Faculty from all six take part in its clusters, Research Conversations and events. {{< todo >}}(Matt or each department) rewrite each description below and add how the department takes part in the Hub{{< /todo >}}

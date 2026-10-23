@@ -106,3 +106,18 @@ def test_write_events_replaces_previous_output(tmp_path):
     m.write_events([], out_dirs={"hiss": tmp_path})
     assert not (tmp_path / "stale.md").exists()
     assert (tmp_path / "_index.md").exists()
+
+
+def test_small_things_episodes_are_kept_however_old():
+    ics = (FIX.read_bytes())
+    # A window that starts long after the 2026-02-05 episode still keeps it; Hub events outside the window go.
+    evs = m.occurrences(ics, date(2028, 1, 1), date(2028, 12, 31), keep_series={"small-things"})
+    assert [e["title"] for e in evs] == ["Small Things: Bhavani Raman & Matt Price"]
+
+
+def test_feed_with_no_events_at_all_fails(tmp_path):
+    empty = tmp_path / "empty.ics"
+    empty.write_bytes(b"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//x//EN\r\nEND:VCALENDAR\r\n")
+    with pytest.raises(SystemExit) as exc:
+        m.main(["--from", str(empty), "--dry-run"])
+    assert exc.value.code not in (0, None)

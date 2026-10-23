@@ -1,7 +1,8 @@
 ---
 title: "About the Hub"
 description: "What the HISS Research Hub does: research clusters, Research Conversations, talk series, and how to take part."
-aliases: ["/what-we-do/"]
+aliases: ["/what-we-do/", "/events/speakers-corner/"]
+outputs: ["html"]
 ---
 
 The Humanities and Interpretive Social Sciences Research Hub brings together faculty from six departments at the University of Toronto Scarborough, so that people working on related questions in different departments find each other and work together.
