@@ -1,5 +1,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+{{- if site.Params.noindex }}
+<meta name="robots" content="noindex">
+{{- end }}
 {{- $title := .Title -}}
 {{- if .IsHome }}{{ $title = printf "%s: a live-recorded podcast from UTSC" site.Title }}{{ else }}{{ $title = printf "%s | %s" .Title site.Title }}{{ end -}}
 <title>{{ $title }}</title>

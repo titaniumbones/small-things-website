@@ -1,0 +1,24 @@
+name: Daily Netlify rebuild
+
+# Netlify only builds when the repo changes. This triggers a build every day so new Outlook events reach the site.
+# Needs a repository secret NETLIFY_BUILD_HOOK holding the build hook URL from Netlify
+# (Site configuration → Build & deploy → Build hooks).
+
+on:
+  schedule:
+    - cron: "0 10 * * *"
+  workflow_dispatch:
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger a Netlify build
+        env:
+          HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::notice::NETLIFY_BUILD_HOOK is not set; skipping."
+            exit 0
+          fi
+          curl -fsS -X POST -d '{}' "$HOOK"

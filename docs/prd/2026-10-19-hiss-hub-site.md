@@ -40,7 +40,7 @@ The home page should serve both: upcoming events near the top, with clear routes
 
 ## Non-goals
 
-- **No server or database.** The site stays a static Hugo build deployed to GitHub Pages.
+- **No server or database.** The site stays a static Hugo build, on GitHub Pages or Netlify (see Hosting).
 - **No custom domain yet.** The site stays at `titaniumbones.github.io/small-things-website/` for now.
 - **No sign-in or accounts** of any kind.
 - **No podcast hosting.** Episode audio lives wherever it already lives. The site links to it.
@@ -55,17 +55,17 @@ These would make the project a failure even if everything else worked:
 
 ## Constraints
 
-- **Static hosting.** GitHub Pages, built by the existing GitHub Actions workflow (`.github/workflows/deploy.yml`).
+- **Static hosting.** GitHub Pages, built by the existing GitHub Actions workflow (`.github/workflows/deploy.yml`), or Netlify, built from `netlify.toml` (see Hosting).
 - **Portable base URL.** The site must keep working if it moves to a custom domain, such as `hiss.hackinghistory.ca`. Moving it should take a change to `baseURL` in `hugo.toml` plus a DNS record, and nothing else. So: no hard-coded absolute URLs in templates or content.
 - **Python through uv.** Any script runs with `uv run`, as the existing scripts do.
 - **Outlook's published ICS feed** is the only machine-readable view of the calendar we have. Its URL is already in `hugo.toml` as `params.outlookFeed`.
 
 ## Hosting: GitHub Pages or Netlify
 
-Matt is willing to move the site to Netlify if that simplifies things. *(TODO (Matt): decide.)* The two options, for the decision:
+Matt is willing to move the site to Netlify if that simplifies things. Netlify is now set up alongside GitHub Pages (2026-10-23): the project `hiss-research-hub` on Matt's personal Netlify account builds every pull request against `main` from `netlify.toml` and posts a preview link on the pull request. GitHub Pages is still the live site. *(TODO (Matt): decide whether and when production moves to Netlify. Moving means pointing people at `hiss-research-hub.netlify.app` or a custom domain, then retiring `deploy.yml`.)* The two options, for the decision:
 
 - **GitHub Pages (what we have).** Free, and already working. Pull requests get checked but not previewed. The only preview is the one-branch `/next/` workaround in `deploy.yml`.
-- **Netlify.** Every pull request gets its own preview URL automatically, so the `/next/` workaround can go. **Netlify Forms** can take event proposals through a form on the site itself, with submissions emailed to the organiser. No server is involved, and the free tier allows 100 submissions a month. Costs: one more account to manage, and Kira and Matt both need access to it. The daily Outlook rebuild would move to a Netlify build hook, triggered by a scheduled GitHub Action or a Netlify scheduled function. The build would need `uv` installed in Netlify's build image.
+- **Netlify.** Every pull request gets its own preview URL automatically, so the `/next/` workaround can go. **Netlify Forms** can take event proposals through a form on the site itself, with submissions emailed to the organiser. No server is involved, and the free tier allows 100 submissions a month. Costs: one more account to manage, and Kira and Matt both need access to it. The daily Outlook rebuild uses a Netlify build hook, triggered by `.github/workflows/netlify-daily.yml` (the hook URL is the repository secret `NETLIFY_BUILD_HOOK`). The build installs `uv` in Netlify's build image.
 
 Either way, the static-site constraint stands, and so does the portable base URL.
 
@@ -73,7 +73,7 @@ Either way, the static-site constraint stands, and so does the portable base URL
 
 - **Outlook is the source of truth for events.** The site imports the feed. It does not keep its own copy of events.
 - **The existing Hugo site is the starting point, not a fresh build.** Keep what works: the Outlook import (`scripts/import_ics.py`), the ICS subscription feeds, the event checks (`scripts/check_events.py`), the tests and the deploy workflow. Replace the identity, navigation and page structure.
-- **Preview before merging.** Build this work on a branch and preview it before merging to `main`. On Netlify, every pull request gets a preview automatically. On GitHub Pages, point `PREVIEW_BRANCH` in `deploy.yml` (on `main`) at the new branch. That replaces the `redesign/minimal` preview, which this work supersedes. Start the new branch from `main`. Borrow layout ideas from `redesign/minimal` where they are useful.
+- **Preview before merging.** Build this work on a branch and preview it before merging to `main`. On Netlify, every pull request gets a preview automatically (this is now set up). On GitHub Pages, point `PREVIEW_BRANCH` in `deploy.yml` (on `main`) at the new branch. That replaces the `redesign/minimal` preview, which this work supersedes. Start the new branch from `main`. Borrow layout ideas from `redesign/minimal` where they are useful.
 - **Speakers' Corner joins the Hub's talk series.** It no longer has a page or menu entry of its own. Its talks are listed with the rest of the talk series, on the About page and in the calendar. Its current description (`content/events/speakers-corner/_index.md`) can become a paragraph in the talk-series section.
 - **Logo:** the official HISS Research Hub logo. *(Matt is locating the file; it will be added to `static/` or `assets/`.)*
 

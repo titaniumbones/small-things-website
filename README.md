@@ -64,6 +64,65 @@ The site publishes iCalendar feeds anyone can subscribe to:
 - every event page has its own `calendar.ics` for "add to my calendar"
 - `/events.json`: the same data for scripts
 
+## Netlify: pull request previews and a second copy of the site
+
+GitHub Pages is still the live site. Netlify runs alongside it, mainly so that every pull request gets its own preview address. This section explains how that works and where each setting lives.
+
+### Where it lives
+
+- **Account:** Matt's personal Netlify account (moptop99@gmail.com), team "moptop99's team", free plan.
+
+- **Project:** `hiss-research-hub`. Dashboard: <https://app.netlify.com/projects/hiss-research-hub>.
+
+- **Connection to GitHub:** through the Netlify GitHub app, which is installed on the `titaniumbones` account with access to selected repositories only. This repository is one of them. If Netlify ever stops seeing the repository, check GitHub → Settings → Applications → Netlify → Repository access.
+
+- **Who can change it:** only Matt, for now. *(TODO (Matt): invite Kira to the Netlify team if she needs to read deploy logs or change settings.)*
+
+### What triggers a build
+
+| Event | What Netlify builds | Address |
+| --- | --- | --- |
+| A pull request is opened against `main`, or a new commit is pushed to its branch | A **deploy preview** of that branch | `https://deploy-preview-<PR number>--hiss-research-hub.netlify.app/` |
+| A commit lands on `main` (usually by merging a pull request) | A **production** build | <https://hiss-research-hub.netlify.app/> |
+| Every day at 10:00 UTC | A production rebuild, so new Outlook events appear | same as production |
+
+When a preview finishes, Netlify posts a comment on the pull request with the preview link and a link to the deploy log, and adds a check called `netlify/hiss-research-hub/deploy-preview` to the pull request. A failed preview never touches the live site or the production copy.
+
+Pushes to other branches are not built: in the project's settings only `main` is a branch Netlify deploys, so the `[context.branch-deploy]` block in `netlify.toml` is unused unless that setting changes.
+
+The daily rebuild exists because Netlify only builds when the repository changes, and Outlook events change without any commit. `.github/workflows/netlify-daily.yml` runs on a schedule and sends a POST request to a Netlify **build hook**: a secret URL that starts a production build. The hook URL is stored as the repository secret `NETLIFY_BUILD_HOOK` (GitHub → Settings → Secrets and variables → Actions). GitHub runs scheduled workflows only from `main`, so the daily rebuild starts once that file is on `main`. You can also start it by hand from the Actions tab ("Daily Netlify rebuild" → "Run workflow").
+
+### What a build does
+
+`netlify.toml` holds the build. Netlify reads it from the branch being built, so a pull request can change its own build. Each build:
+
+1. installs `uv` (Netlify's build image has Python but not uv);
+2. runs `scripts/check_events.py`, the same event checks as on GitHub;
+3. pulls events from the Outlook feed with `scripts/import_ics.py`;
+4. runs the test suite (previews and production only);
+5. builds the site with Hugo, setting `--baseURL` to the address of this particular deploy so that links and feeds point at the preview, not at the live site.
+
+Netlify sets two variables the build uses: `URL`, the production address, and `DEPLOY_PRIME_URL`, the address of this deploy. Previews also set `HUGO_PARAMS_NOINDEX=true`, which adds a `noindex` tag to every page; Netlify itself also sends an `X-Robots-Tag: noindex` header on previews. Either keeps search engines from listing a preview.
+
+### Settings that are not in the repository
+
+Most of the build is in `netlify.toml`, but a few things are set in the Netlify dashboard (Project configuration):
+
+- the production branch (`main`) and which branches deploy (only `main`);
+- the environment variable `HUGO_VERSION` (also set in `netlify.toml`; the dashboard copy covers branches that do not have the file yet);
+- the build hook "Daily rebuild (GitHub Actions)" (Build & deploy → Build hooks);
+- deploy notifications, including the pull request comment.
+
+### When a build fails
+
+Open the deploy log from the link in the pull request comment, or from Deploys in the dashboard. The log shows each step above in order. The usual causes are an event file the checks reject, a failing test, or a Hugo template error, and the same failure shows up locally with `make check`, `make test` or `make build`. To rebuild without a new commit, use "Retry deploy" in the dashboard.
+
+### Using the Netlify CLI on this repository
+
+The Netlify CLI on Matt's Mac is logged in to a different account. For this repository it must use the moptop99 account. A local `.envrc` file (not committed; it needs [direnv](https://direnv.net/)) sets `NETLIFY_AUTH_TOKEN` from the macOS Keychain item `netlify-moptop99` whenever you are inside the repository; the CLI uses that token in preference to its own login. `netlify link` has already connected the folder to the project (stored in `.netlify/`, also not committed). Useful commands: `netlify status`, `netlify open`, `netlify logs --source deploy`, `netlify env:list`.
+
+The token expires on 2027-01-21. To replace it, make a new one under Netlify → User settings → Applications → Personal access tokens, then store it with `security add-generic-password -U -s netlify-moptop99 -a moptop99 -w <token>`.
+
 ## Previewing another branch
 
 The deploy workflow can publish a second branch alongside the live site at `/next/`, so two versions can be compared in a browser. The branch name is the `PREVIEW_BRANCH` setting at the top of `.github/workflows/deploy.yml`. The preview carries a `noindex` tag so search engines ignore it, and a failure to build it never blocks the main site. Set the value to an empty string to stop publishing the preview, for example once the branch has been merged.
@@ -92,6 +151,7 @@ make build      # production build into public/
 - `scripts/import_ics.py`: the Outlook import. `scripts/check_events.py`: the validator that runs on pull requests.
 - `tests/`: pytest suite for both scripts and a build smoke test.
 - `.github/workflows/deploy.yml`: builds on push, pull request and a daily schedule; deploys to GitHub Pages.
+- `netlify.toml`: the Netlify build, used for pull request previews. `.github/workflows/netlify-daily.yml` triggers a daily Netlify rebuild through a build hook.
 - `docs/superpowers/specs/`: the design spec.
 
 ## Colours
