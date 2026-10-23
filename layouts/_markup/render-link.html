@@ -1,0 +1,5 @@
+{{- /* Markdown links. A site path written as /events/ gets the site's base path, so content keeps working when the site lives under a subpath or moves domain. */ -}}
+{{- $dest := .Destination -}}
+{{- if and (hasPrefix $dest "/") (not (hasPrefix $dest "//")) }}{{ $dest = strings.TrimPrefix "/" $dest | relURL }}{{ end -}}
+<a href="{{ $dest | safeURL }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if strings.HasPrefix $dest "http" }} rel="external"{{ end }}>{{ .Text | safeHTML }}</a>
+{{- /* chomp trailing newline */ -}}

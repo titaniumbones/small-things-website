@@ -3,9 +3,11 @@ public/
 resources/_gen/
 .hugo_build.lock
 
-# HISS Hub events are generated from the Outlook feed at build time
+# Events are generated from the Outlook feed at build time
 content/events/hiss/*
 !content/events/hiss/_index.md
+content/events/small-things/*
+!content/events/small-things/_index.md
 
 # Python
 __pycache__/

@@ -1,0 +1,5 @@
+{{- /* A placeholder for a fact nobody has confirmed yet. Write {{< todo >}}(Matt) confirm the cluster names{{< /todo >}}.
+     Shown in `hugo server` and on Netlify previews (params.showTodos); dropped from the live site. `make todos` lists them all. */ -}}
+{{- if or hugo.IsServer site.Params.showTodos -}}
+<mark class="todo">TODO {{ .Inner | .Page.RenderString }}</mark>
+{{- end -}}

@@ -1,66 +1,57 @@
-# Small Things
+# HISS Research Hub website
 
-The website for *Small Things*, a live-recorded podcast from the Humanities and Interpretive Social Sciences (HISS) Research Hub at the University of Toronto Scarborough, with a shared calendar for Small Things, HISS Hub events and HCS Speakers' Corner.
+The website of the Humanities and Interpretive Social Sciences (HISS) Research Hub at the University of Toronto Scarborough: what the Hub is, its six departments, its calendar of events, and its podcast *Small Things*.
 
 Live site: https://titaniumbones.github.io/small-things-website/
 
-It is a static site built with [Hugo](https://gohugo.io). Every event is one Markdown file. Nothing else is needed to add or change an event.
+It is a static site built with [Hugo](https://gohugo.io). Every page's text is a Markdown file you can edit in the GitHub web editor. Every event comes from the Hub's Outlook calendar.
 
-## Add an event in five steps
+*TODO (Matt): add the official HISS logo. The header shows a text wordmark until then; the logo goes in `layouts/partials/header.html` and `footer.html`.*
 
-You can do all of this in the GitHub web editor. No software to install.
+## Adding an event
 
-1. Open the folder for the series: `content/events/small-things/` or `content/events/speakers-corner/`. (HISS Hub events come from the Hub's Outlook calendar automatically; see below.)
+Add it to the Hub's Outlook calendar. That is all. The site reads the calendar's published feed once a day (and on every change to the repository), so a new event appears on the site within a day. To change or cancel an event, change it in Outlook.
 
-2. Click **Add file → Create new file**. Name it `YYYY-MM-DD-short-name.md`, for example `2026-11-12-tanya-titchkosky-cane.md`.
+- **Small Things recordings:** start the Outlook title with `Small Things:`, for example `Small Things: Bhavani Raman & Matt Price`. That puts the event in the *Small Things* series and on the Small Things page. Then add a row for the episode (guest, department, object, audio link) to the "Episode details" table in `content/small-things.md`.
 
-3. Paste this and fill it in:
+- **Everything else** (talks, Research Conversations, Speakers' Corner, screenings, launches) needs no prefix.
 
-   ```yaml
-   ---
-   title: "Tanya Titchkosky: a white cane"
-   date: 2026-11-12T13:00:00-05:00
-   end: 2026-11-12T14:30:00-05:00
-   location: "KW 130"
-   status: confirmed
-   speakers:
-     - "Tanya Titchkosky"
-   # Small Things episodes only:
-   episode: 2
-   object: "A white cane"
-   department: "Anthropology"
-   audio: ""
-   ---
+- **Location and a link:** fill in Outlook's location field, and put a web address in the event if there is one. Both show on the site.
 
-   A sentence or two about the event. This is what people see on the event page.
-   ```
+People who want to suggest an event use the "Propose an event" link, which emails `params.contactEmail` (or goes to the form in `params.proposeEventUrl`, once there is one) in `hugo.toml`.
 
-   The time needs Toronto's offset: `-04:00` from mid-March to early November, `-05:00` the rest of the year. `status` is `confirmed`, `tbc` (date not yet fixed) or `cancelled`.
+## Changing the text of a page
 
-4. Click **Commit changes**, choose **Create a new branch and start a pull request**, and open the pull request.
+Each page is one Markdown file. Its text is under `##` headings; each heading becomes one section of the page. Change the words, commit, and the site rebuilds.
 
-5. Wait a minute. A check runs and tells you in plain words if anything is wrong with the file. When it is green, merge. The site rebuilds and deploys itself.
+| Page | File |
+| --- | --- |
+| Home | `content/_index.md` (the big headline is `headline:` at the top) |
+| About the Hub | `content/about.md` |
+| Departments | `content/departments.md` |
+| Calendar | `content/events/_index.md` (the event list itself comes from Outlook) |
+| Small Things | `content/small-things.md` (the "Looking for guests" badge is `badge:` at the top) |
+| Contact | `content/contact.md` |
+| Footer line | `description` in `hugo.toml` |
 
-To change an event, open its file and edit it the same way. To publish an episode recording, put the audio file's URL in `audio`.
+In the GitHub web editor: open the file, click the pencil, edit, then **Commit changes → Create a new branch and start a pull request**. The pull request gets a Netlify preview link (see below) so you can check the page before merging.
 
-## The three series
+### Placeholders
 
-| Series | Folder | Where events come from |
-| --- | --- | --- |
-| Small Things | `content/events/small-things/` | Files in this repo |
-| Speakers' Corner | `content/events/speakers-corner/` | Files in this repo |
-| HISS Hub | `content/events/hiss/` | Imported from the HISS Hub Outlook calendar at build time |
+Where a fact is not known yet, the text marks it like this:
 
-Each folder has an `_index.md` with the series description. Edit it to change the text on the series page.
+```
+Four clusters are forming. {{< todo >}}(Matt) confirm the cluster names{{< /todo >}}
+```
 
-HISS Hub events are pulled from the Outlook feed named in `hugo.toml` by `scripts/import_ics.py`, once a day and on every push. The imported files are not committed. To change a HISS Hub event, change it in the Outlook calendar. If a Hub event is also a Small Things or Speakers' Corner event, give the repo file the same title and the import skips the duplicate.
+The placeholder shows, highlighted in yellow, on pull request previews and when you run the site locally. The live site leaves it out. To replace it, write the real fact and delete the whole `{{< todo >}}…{{< /todo >}}`. `make todos` lists every placeholder left.
 
 ## Calendar feeds
 
 The site publishes iCalendar feeds anyone can subscribe to:
 
-- `/calendar.ics`: everything
-- `/events/small-things/calendar.ics`, `/events/speakers-corner/calendar.ics`, `/events/hiss/calendar.ics`: one series each
+- `/calendar.ics`: every event
+- `/events/hiss/calendar.ics` and `/events/small-things/calendar.ics`: one series each
 - every event page has its own `calendar.ics` for "add to my calendar"
 - `/events.json`: the same data for scripts
 
@@ -123,37 +114,34 @@ The Netlify CLI on Matt's Mac is logged in to a different account. For this repo
 
 The token expires on 2027-01-21. To replace it, make a new one under Netlify → User settings → Applications → Personal access tokens, then store it with `security add-generic-password -U -s netlify-moptop99 -a moptop99 -w <token>`.
 
-## Previewing another branch
-
-The deploy workflow can publish a second branch alongside the live site at `/next/`, so two versions can be compared in a browser. The branch name is the `PREVIEW_BRANCH` setting at the top of `.github/workflows/deploy.yml`. The preview carries a `noindex` tag so search engines ignore it, and a failure to build it never blocks the main site. Set the value to an empty string to stop publishing the preview, for example once the branch has been merged.
-
 ## Working locally
 
 You need [Hugo](https://gohugo.io/installation/) (extended edition) and [uv](https://docs.astral.sh/uv/).
 
 ```sh
-make import     # optional: pull HISS Hub events from Outlook
-make serve      # http://localhost:1313/
-make check      # validate event files
-make test       # Python tests plus a Hugo build smoke test
+make import     # pull every event from Outlook (without it the calendar is empty)
+make serve      # http://localhost:1313/small-things-website/, placeholders shown
+make check      # validate imported event files and list placeholders
+make todos      # list placeholders only
+make test       # Python tests plus Hugo build tests
 make build      # production build into public/
 ```
 
-`hugo new events/small-things/2026-11-12-short-name.md` creates a new event file from the template in `archetypes/events.md`.
+If the Outlook feed cannot be fetched or is not a calendar, the import stops with an error and the build fails, so the live site keeps its last good version instead of publishing with no events.
 
 ## How it is put together
 
 - `hugo.toml`: site settings, menu, the Outlook feed URL, and the custom `.ics` and `.json` output formats.
-- `layouts/`: templates. `home.html`, `calendar.html`, `events/section.html` (series pages), `events/page.html` (one event), and the `*.calendar.ics` and `home.eventsjson.json` feed templates. Shared pieces live in `layouts/partials/`.
+- `layouts/`: templates. `home.html`, `page.html` (About, Departments, Contact), `small-things.html`, `events/section.html` (the calendar), `events/page.html` (one event), and the `*.calendar.ics` and `home.eventsjson.json` feed templates. `partials/content-parts.html` and `partials/sections.html` turn a page's `##` headings into sections; `shortcodes/todo.html` is the placeholder. No page text lives in templates.
 - `assets/scss/main.scss`: all styles. Colours and type are set as variables at the top. Hugo compiles it; there is no npm.
 - `assets/js/site.js`: the calendar's series filter. The page works without it.
-- `static/fonts/`: Bricolage Grotesque, self-hosted.
-- `scripts/import_ics.py`: the Outlook import. `scripts/check_events.py`: the validator that runs on pull requests.
-- `tests/`: pytest suite for both scripts and a build smoke test.
+- `static/fonts/`: Space Grotesk and JetBrains Mono, self-hosted (OFL).
+- `scripts/import_ics.py`: the Outlook import, which writes `content/events/hiss/` and `content/events/small-things/` (not committed). `scripts/check_events.py`: checks those files. `scripts/list_todos.py`: lists placeholders.
+- `tests/`: pytest suite for the scripts, and build tests that run Hugo on a copy of the site with known events.
 - `.github/workflows/deploy.yml`: builds on push, pull request and a daily schedule; deploys to GitHub Pages.
 - `netlify.toml`: the Netlify build, used for pull request previews. `.github/workflows/netlify-daily.yml` triggers a daily Netlify rebuild through a build hook.
-- `docs/superpowers/specs/`: the design spec.
+- `docs/prd/`: product requirements. `docs/superpowers/specs/` and `docs/superpowers/plans/`: design notes and implementation plans.
 
-## Colours
+## Look
 
-The University of Toronto blue `#1e3765` is the ground. Each series has one colour: Small Things coral `#ff5c39`, Speakers' Corner yellow `#f5c400`, HISS Hub teal `#007fa3` (the UofT accent blue). Series colour is never the only signal; every chip also carries the series name.
+The design is Kira Jensen's: Space Grotesk for text, JetBrains Mono for small labels, zinc greys on white, a near-black hero with a faint grid, and University of Toronto blue `#1e3765` for links and accents. Colours and type are variables at the top of `assets/scss/main.scss`. Series are told apart by name on every event, not by colour alone.

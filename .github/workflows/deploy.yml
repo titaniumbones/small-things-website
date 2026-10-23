@@ -21,7 +21,7 @@ concurrency:
 env:
   # A second branch published alongside the site at /next/ so two versions can be compared live.
   # Set it to an empty string to stop publishing the preview.
-  PREVIEW_BRANCH: redesign/minimal
+  PREVIEW_BRANCH: ""
 
 jobs:
   build:
@@ -39,9 +39,9 @@ jobs:
       - name: Check event files
         run: uv run scripts/check_events.py
 
-      - name: Import HISS Hub events from Outlook
-        # A feed outage should not take the site down: fall back to building without imported events.
-        run: uv run scripts/import_ics.py || echo "::warning::Outlook import failed; building without HISS Hub events"
+      - name: Import events from Outlook
+        # Outlook is the only source of events: if the feed fails, fail the build and keep the last good deploy.
+        run: uv run scripts/import_ics.py
 
       - name: Run tests
         run: uv run --group dev pytest -q

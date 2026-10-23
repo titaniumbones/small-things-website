@@ -5,6 +5,8 @@
 - **Implementer:** Kira Jensen
 - **Date:** 2026-10-19
 
+- **Updated:** 2026-10-23. Decisions since this draft are in `docs/superpowers/specs/2026-10-23-hiss-hub-redesign-design.md`, and the sections below are amended to match.
+
 ## Why
 
 This repository currently builds a website for *Small Things*, the Hub's live-recorded podcast. The HISS Research Hub itself has no website. A site at hiss.utsc.utoronto.ca was planned but never built, although the current site links to it as if it existed.
@@ -36,7 +38,7 @@ The home page should serve both: upcoming events near the top, with clear routes
 
 7. **Easy to edit with Claude.** The README and a `CLAUDE.md` file explain where each kind of content lives and how to change it. Someone should be able to say "update the Geography description" or "add a page for the new cluster" to Claude Code and get a correct change.
 
-8. **Looks like it belongs to U of T.** The visual style follows U of T's official brand at least loosely: its colours, its typography where it can be licensed or a close free substitute, and its general restraint.
+8. **Kira Jensen's redesign is the look** (decided 2026-10-23, replacing "looks like it belongs to U of T"). See *Visual style*.
 
 ## Non-goals
 
@@ -75,7 +77,7 @@ Either way, the static-site constraint stands, and so does the portable base URL
 - **The existing Hugo site is the starting point, not a fresh build.** Keep what works: the Outlook import (`scripts/import_ics.py`), the ICS subscription feeds, the event checks (`scripts/check_events.py`), the tests and the deploy workflow. Replace the identity, navigation and page structure.
 - **Preview before merging.** Build this work on a branch and preview it before merging to `main`. On Netlify, every pull request gets a preview automatically (this is now set up). On GitHub Pages, point `PREVIEW_BRANCH` in `deploy.yml` (on `main`) at the new branch. That replaces the `redesign/minimal` preview, which this work supersedes. Start the new branch from `main`. Borrow layout ideas from `redesign/minimal` where they are useful.
 - **Speakers' Corner joins the Hub's talk series.** It no longer has a page or menu entry of its own. Its talks are listed with the rest of the talk series, on the About page and in the calendar. Its current description (`content/events/speakers-corner/_index.md`) can become a paragraph in the talk-series section.
-- **Logo:** the official HISS Research Hub logo. *(Matt is locating the file; it will be added to `static/` or `assets/`.)*
+- **Logo:** the official HISS Research Hub logo. Matt could not find the file (2026-10-23), so the header uses a text wordmark until it turns up. *(TODO (Matt): find the logo.)*
 
 ## Pages
 
@@ -102,8 +104,8 @@ This is a starting structure. The builder can adjust it.
 
 - The daily scheduled build already pulls the Outlook feed. Keep it, so new Outlook events appear on the site within a day without anyone touching the repository.
 - Keep the ICS subscription feeds so people can add the Hub calendar to their own calendar app.
-- **Moving the repository's own events into Outlook.** Ten events live as files in the repo today: seven *Small Things* episodes and three Speakers' Corner talks. They have to be in Outlook before their files are deleted, or they vanish from the site. The site already publishes them as ICS. The builder exports those feeds as one `.ics` file. Matt imports it into the Hub's Outlook calendar and confirms the events show up in the published feed. Only then are the files and the duplicate-title check in `scripts/import_ics.py` removed. *(TODO (Matt): can the HCS organisers of Speakers' Corner add events to the Hub calendar, or do they send them to the calendar's owner?)*
-- **If the Outlook import fails** *(builder's call)*: now that Outlook is the only source of events, a failed import should fail the build and leave the last good deploy in place. Today's build publishes with no events instead.
+- **The repository's own events were deleted, not moved into Outlook** (decided 2026-10-23). Nine of the ten were placeholders ("Guest and object to be announced"), and the tenth, the Bhavani Raman episode, was already in Outlook. Importing placeholders would have put fake events into the real calendar. Kira keeps the Outlook calendar up to date from now on. *(TODO (Matt): can the HCS organisers of Speakers' Corner add events to the Hub calendar, or do they send them to the calendar's owner?)*
+- **If the Outlook import fails**, the build fails and the last good deploy stays in place (done 2026-10-23).
 - **Old URLs** *(my call; no posters or QR codes are known to point at the current site)*: keep the site-wide feed at its current path (`/calendar.ics`). Give moved pages Hugo `aliases` so their old URLs still lead somewhere. Old per-series feeds can go.
 - **Proposing an event.** The recommended mechanism is a Microsoft Form on U of T's Microsoft 365. It needs no server, and people sign in with their U of T account, which they already have. Submissions arrive with whoever owns the form, who adds accepted events to Outlook by hand. The form's URL goes in `hugo.toml` as a parameter. If the parameter is empty, the link falls back to a `mailto:` link to the contact address.
   - We rejected GitHub issue forms because most faculty and students do not have GitHub accounts.
@@ -119,25 +121,24 @@ The current About page also credits the Mentoring Partnership Fund and the six f
 
 ## Visual style
 
-- Follow the U of T brand guidelines (brand.utoronto.ca): U of T blue as the primary colour, a restrained palette and a clean sans-serif. *(Builder: check the current guidelines for the exact colour values and typefaces, and use a free web font where the official face is not licensed for the web.)*
-- The current branch `redesign/minimal` has a minimal design with Space Grotesk. Treat it as a reference for layout, not for brand.
+- **Kira Jensen's redesign** from the `redesign/minimal` branch (decided 2026-10-23): Space Grotesk and JetBrains Mono, zinc greys on white, a near-black hero with a faint grid, and U of T blue `#1e3765` for links and accents. This replaces the earlier plan to follow the U of T brand guidelines.
 - Accessible contrast and a layout that works on a phone.
 
 ## Cleanup
 
-- Remove `params.hubUrl` from `hugo.toml` and every link to hiss.utsc.utoronto.ca.
+- Remove `params.hubUrl` from `hugo.toml` and every link to hiss.utsc.utoronto.ca. *(Done 2026-10-23.)*
 - Rename the site's `title`, `description` and README from *Small Things* to the Hub.
 - Decide whether the repository itself gets renamed. Renaming changes the GitHub Pages URL. *(TODO (Matt).)*
 
 ## Open questions
 
-1. **How series events are told apart.** Once every event comes from Outlook, the site needs a way to know which events are *Small Things* episodes, for that page's list. The likeliest options are a title prefix (`Small Things: …`) or a marker line in the Outlook event's description. The builder should check what the published ICS feed actually carries, such as whether Outlook categories survive into it, and propose a convention for Matt to approve.
-2. **Small Things episode details.** Each episode currently has a repository file holding its object, guest, department and audio link. If events come only from Outlook, where do those details go? A table on the Small Things page is the simplest option.
+1. **How series events are told apart.** *Answered 2026-10-23:* the published feed carries no categories, so an Outlook title starting `Small Things:` marks a *Small Things* episode.
+2. **Small Things episode details.** *Answered 2026-10-23:* a Markdown table in `content/small-things.md`.
 3. **Who owns the event-proposal form** and receives its submissions.
 
 ## Done means
 
-- The site at the current URL presents the HISS Research Hub, with the HISS logo, U of T–like styling, and pages for the Hub, the departments, the calendar, *Small Things* and contact.
+- The site at the current URL presents the HISS Research Hub, with a HISS wordmark (logo pending), Kira's redesign, and pages for the Hub, the departments, the calendar, *Small Things* and contact.
 - Every event on the site comes from the Outlook feed. Adding an event in Outlook puts it on the site after the next daily build, with no repository change.
 - A "Propose an event" link works and needs no server.
 - Every piece of visible text can be changed by editing one Markdown file. The README and `CLAUDE.md` say which file.

@@ -1,0 +1,4 @@
+{{- /* The "Propose an event" address: the form in params.proposeEventUrl if set, else an email to params.contactEmail. */ -}}
+{{- $url := printf "mailto:%s?subject=%s" site.Params.contactEmail (replace (urlquery "Event proposal") "+" "%20") -}}
+{{- with site.Params.proposeEventUrl }}{{ $url = . }}{{ end -}}
+{{- return $url -}}

@@ -1,0 +1,11 @@
+{{- /* Splits a page's rendered Markdown at each ## heading.
+     Returns (dict "intro" <HTML before the first ##> "sections" (slice (dict "heading" <h2 HTML> "body" <HTML>) ...)).
+     Call as: partial "content-parts.html" .Content */ -}}
+{{- $parts := split (string .) "<h2" -}}
+{{- $sections := slice -}}
+{{- range after 1 $parts -}}
+  {{- $bits := split (printf "<h2%s" .) "</h2>" -}}
+  {{- $heading := printf "%s</h2>" (index $bits 0) | replaceRE `^<h2` `<h2 class="h-md"` -}}
+  {{- $sections = $sections | append (dict "heading" ($heading | safeHTML) "body" (delimit (after 1 $bits) "</h2>" | safeHTML)) -}}
+{{- end -}}
+{{- return dict "intro" (trim (index $parts 0) " \n" | safeHTML) "sections" $sections -}}
