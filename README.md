@@ -64,6 +64,12 @@ The site publishes iCalendar feeds anyone can subscribe to:
 - every event page has its own `calendar.ics` for "add to my calendar"
 - `/events.json`: the same data for scripts
 
+## Pull request previews (Netlify)
+
+Every pull request against `main` is also built on Netlify, project `hiss-research-hub` on Matt's personal Netlify account. When the build finishes, Netlify comments on the pull request with a preview link of the form `https://deploy-preview-<PR number>--hiss-research-hub.netlify.app/`, and its build shows up as a check on the pull request. Each push to the branch rebuilds the preview. Previews carry a `noindex` tag. The build settings live in `netlify.toml`.
+
+To use the Netlify CLI on this repository, it needs the moptop99 account rather than whatever account the CLI is logged in to. A local `.envrc` (not committed; it needs [direnv](https://direnv.net/)) sets `NETLIFY_AUTH_TOKEN` from the macOS Keychain item `netlify-moptop99`. The token expires on 2027-01-21; make a new one under Netlify → User settings → Applications and replace the Keychain item with `security add-generic-password -U -s netlify-moptop99 -a moptop99 -w <token>`.
+
 ## Previewing another branch
 
 The deploy workflow can publish a second branch alongside the live site at `/next/`, so two versions can be compared in a browser. The branch name is the `PREVIEW_BRANCH` setting at the top of `.github/workflows/deploy.yml`. The preview carries a `noindex` tag so search engines ignore it, and a failure to build it never blocks the main site. Set the value to an empty string to stop publishing the preview, for example once the branch has been merged.
@@ -92,6 +98,7 @@ make build      # production build into public/
 - `scripts/import_ics.py`: the Outlook import. `scripts/check_events.py`: the validator that runs on pull requests.
 - `tests/`: pytest suite for both scripts and a build smoke test.
 - `.github/workflows/deploy.yml`: builds on push, pull request and a daily schedule; deploys to GitHub Pages.
+- `netlify.toml`: the Netlify build, used for pull request previews. `.github/workflows/netlify-daily.yml` triggers a daily Netlify rebuild through a build hook.
 - `docs/superpowers/specs/`: the design spec.
 
 ## Colours
